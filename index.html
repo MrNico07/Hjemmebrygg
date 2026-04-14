@@ -68,6 +68,81 @@
   <p>Utforsk oppskrifter, lagre favoritter og lag ditt eget øl — steg for steg.</p>
 </section>
 
+<!-- FEATURED PICKS SECTION -->
+<div class="stats-bar" style="margin-bottom:4rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+  <div style="padding:2rem;background:linear-gradient(135deg,#10b98133,#10b98122);border-radius:12px;border:1px solid #10b98144;text-align:center;grid-column:1/-1">
+    <h2 style="margin:0 0 1rem;font-size:1.3rem;color:var(--text)">✨ Våre Anbefalinger</h2>
+    <p style="margin:0;color:var(--muted);font-size:0.95rem">Starten på din bryggingseventyr — fra lett til avansert</p>
+  </div>
+  <div class="reveal" style="padding:1.5rem;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s" onclick="handleFeaturedPick('ginger')">
+    <div style="font-size:3rem;margin-bottom:.5rem">🍋</div>
+    <h3 style="margin:0.5rem 0;font-size:1rem;color:var(--text)">Sterk Ginger Beer</h3>
+    <p style="margin:0.5rem 0;font-size:0.85rem;color:var(--muted)">Perfekt start — lett og krydret</p>
+    <span style="display:inline-block;margin-top:0.5rem;background:#10b981;color:white;font-size:10px;padding:4px 8px;border-radius:12px">🟢 Beginner</span>
+  </div>
+  <div class="reveal" style="padding:1.5rem;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s" onclick="handleFeaturedPick('ipa')">
+    <div style="font-size:3rem;margin-bottom:.5rem">🍍</div>
+    <h3 style="margin:0.5rem 0;font-size:1rem;color:var(--text)">Tropisk IPA</h3>
+    <p style="margin:0.5rem 0;font-size:0.85rem;color:var(--muted)">Avansert humle-design — ganske nøye</p>
+    <span style="display:inline-block;margin-top:0.5rem;background:#f59e0b;color:white;font-size:10px;padding:4px 8px;border-radius:12px">🟡 Intermediate</span>
+  </div>
+  <div class="reveal" style="padding:1.5rem;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s" onclick="handleFeaturedPick('stout')">
+    <div style="font-size:3rem;margin-bottom:.5rem">☕</div>
+    <h3 style="margin:0.5rem 0;font-size:1rem;color:var(--text)">Kremet Stout</h3>
+    <p style="margin:0.5rem 0;font-size:0.85rem;color:var(--muted)">Klassiker med dybde — kompleks og fin</p>
+    <span style="display:inline-block;margin-top:0.5rem;background:#f59e0b;color:white;font-size:10px;padding:4px 8px;border-radius:12px">🟡 Intermediate</span>
+  </div>
+</div>
+
+<!-- GETTING STARTED SECTION -->
+<div style="max-width:1200px;margin:0 auto 4rem;padding:0 2rem">
+  <div class="card fade-up" style="background:linear-gradient(135deg,var(--card-bg),rgba(255,255,255,.02));border:1px solid var(--border)">
+    <h2 style="margin-top:0;display:flex;align-items:center;gap:.5rem">📚 Kom i Gang</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;margin-top:1.5rem">
+      <div style="padding:1.5rem;background:rgba(59,130,246,.08);border-radius:8px;border-left:3px solid #3b82f6">
+        <div style="font-size:1.8rem;margin-bottom:.5rem">🔧</div>
+        <h3 style="margin:0.5rem 0 0.5rem;font-size:0.95rem;color:var(--text)">Du trenger ikke mye utstyr</h3>
+        <p style="margin:0;font-size:0.85rem;color:var(--muted)">Starter du, trenger du egentlig bare gryte, termometer og hydrometer — resten lærer du etter hvert.</p>
+      </div>
+      <div style="padding:1.5rem;background:rgba(34,197,94,.08);border-radius:8px;border-left:3px solid #22c55e">
+        <div style="font-size:1.8rem;margin-bottom:.5rem">⏱️</div>
+        <h3 style="margin:0.5rem 0 0.5rem;font-size:0.95rem;color:var(--text)">Ca. 3–4 timer bryggedag</h3>
+        <p style="margin:0;font-size:0.85rem;color:var(--muted)">Bryggedagen tar noen timer, men gjenfermentasjonen skjer i bakgrunnen — du kan gjøre andre ting!</p>
+      </div>
+      <div style="padding:1.5rem;background:rgba(168,85,247,.08);border-radius:8px;border-left:3px solid #a855f7">
+        <div style="font-size:1.8rem;margin-bottom:.5rem">🧪</div>
+        <h3 style="margin:0.5rem 0 0.5rem;font-size:0.95rem;color:var(--text)">Eksperimentering = moro</h3>
+        <p style="margin:0;font-size:0.85rem;color:var(--muted)">Hver brygging lærer deg noe nytt — begynn enkelt, så kan du variere senere!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BREWING STATS SECTION -->
+<div style="max-width:1200px;margin:0 auto 4rem;padding:0 2rem">
+  <div class="card fade-up" style="text-align:center">
+    <h2 style="margin-top:0">Din Bryggingsprofil</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.5rem;margin-top:1.5rem">
+      <div style="padding:1.5rem;background:var(--bg);border-radius:8px">
+        <div style="font-size:2rem;margin-bottom:.5rem" id="totalBrewTime">—</div>
+        <div style="font-size:0.85rem;color:var(--muted)">Timer på bryggedag</div>
+      </div>
+      <div style="padding:1.5rem;background:var(--bg);border-radius:8px">
+        <div style="font-size:2rem;margin-bottom:.5rem" id="avgAbv">—</div>
+        <div style="font-size:0.85rem;color:var(--muted)">Gjennomsnittlig ABV</div>
+      </div>
+      <div style="padding:1.5rem;background:var(--bg);border-radius:8px">
+        <div style="font-size:2rem;margin-bottom:.5rem" id="difficultyLevel">—</div>
+        <div style="font-size:0.85rem;color:var(--muted)">Fleste øl er</div>
+      </div>
+      <div style="padding:1.5rem;background:var(--bg);border-radius:8px">
+        <div style="font-size:2rem;margin-bottom:.5rem" id="favoriteFlavor">—</div>
+        <div style="font-size:0.85rem;color:var(--muted)">Din stil</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="stats-bar">
   <div class="stat-card fade-up">
     <div class="stat-val" id="statRecipes">4</div>
@@ -175,6 +250,48 @@ function toggleFav(id, e){
   render();
 }
 
+function handleFeaturedPick(id){
+  trackView(id, BEERS.find(b=>b.id===id).link);
+}
+
+function calculateBrewingProfile(){
+  const favBeers = BEERS.filter(b => favs.includes(b.id));
+  const allBeers = favBeers.length > 0 ? favBeers : BEERS;
+  
+  // Total brew time
+  const totalHours = allBeers.reduce((sum, b) => {
+    const hours = parseInt(b.brewTime.replace(/[^0-9]/g, '')) || 0;
+    return sum + hours;
+  }, 0);
+  document.getElementById('totalBrewTime').textContent = totalHours + 'h';
+  
+  // Average ABV
+  const avgAbv = (allBeers.reduce((sum, b) => sum + b.abv, 0) / allBeers.length).toFixed(1);
+  document.getElementById('avgAbv').textContent = avgAbv + '%';
+  
+  // Most common difficulty
+  const difficulties = {};
+  allBeers.forEach(b => {
+    difficulties[b.difficulty] = (difficulties[b.difficulty] || 0) + 1;
+  });
+  const topDiff = Object.keys(difficulties).reduce((a, b) => difficulties[a] > difficulties[b] ? a : b);
+  document.getElementById('difficultyLevel').textContent = topDiff;
+  
+  // Flavor profile (based on sweetness/sourness/dryness)
+  const avgSweetness = allBeers.reduce((sum, b) => sum + (b.sweetness || 0), 0) / allBeers.length;
+  const avgSourness = allBeers.reduce((sum, b) => sum + (b.sourness || 0), 0) / allBeers.length;
+  const avgDryness = allBeers.reduce((sum, b) => sum + (b.dryness || 0), 0) / allBeers.length;
+  
+  let flavor = '🍺 Balansert';
+  if(avgSweetness > 3.5) flavor = '🍯 Søt';
+  else if(avgDryness > 3.5) flavor = '🥃 Tørr';
+  else if(avgSourness > 2.5) flavor = '🍋 Sur';
+  
+  document.getElementById('favoriteFlavor').textContent = flavor;
+}
+
+calculateBrewingProfile();
+
 function setTag(tag){
   activeTag=tag;
   document.querySelectorAll('.tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.tag===tag));
@@ -230,6 +347,7 @@ function render(){
     </div>`;
   }).join('');
   document.getElementById('statFavs').textContent=favs.length;
+  calculateBrewingProfile();
 }
 
 function trackView(id, link){
