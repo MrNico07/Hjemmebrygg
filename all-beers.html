@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alle øl – Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .filter-bar {
+      max-width: 1200px; margin: 0 auto 2rem; padding: 0 2rem;
+    }
+    .beer-grid {
+      max-width: 1200px; margin: 0 auto 5rem; padding: 0 2rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .compare-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--header-bg); color: #fff;
+      padding: .9rem 2rem; display: flex; align-items: center;
+      gap: 12px; z-index: 200; transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.34,1.2,.64,1);
+      box-shadow: 0 -4px 24px rgba(0,0,0,.25);
+    }
+    .compare-bar.show { transform: translateY(0); }
+    .compare-bar span { font-size: 14px; font-weight: 400; opacity: .85; }
+    .compare-slot {
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px; padding: 4px 12px; font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .compare-slot button { background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; line-height: 1; }
+    .compare-btn {
+      margin-left: auto; background: #fff; color: var(--accent2);
+      border: none; padding: 8px 18px; border-radius: 20px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .compare-btn:hover { opacity: .85; }
+    .compare-btn:disabled { opacity: .4; cursor: default; }
+    .card-compare-check {
+      position: absolute; top: 10px; left: 52px;
+      background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
+      border: none; cursor: pointer; font-size: 13px;
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s; color: #fff;
+    }
+    .card-compare-check.selected { background: var(--accent); }
+
+    /* COMPARE MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 500;
+      display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--bg2); border-radius: var(--radius-lg); padding: 2rem;
+      max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto;
+      box-shadow: var(--shadow-lg); animation: fadeUp .3s ease;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
+    }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .compare-table th { text-align: left; padding: .6rem .8rem; color: var(--muted); font-weight: 400; font-size: 12px; border-bottom: 1px solid var(--card-border); }
+    .compare-table td { padding: .7rem .8rem; border-bottom: 1px solid var(--card-border); vertical-align: top; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; }
+    .modal-close { float: right; background: none; border: 1px solid var(--card-border); color: var(--muted); cursor: pointer; padding: 6px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+    .modal-close:hover { background: var(--bg3); }
+
+    .empty-state { text-align: center; padding: 4rem; color: var(--muted); grid-column: 1/-1; }
+    .stats-bar { max-width: 1200px; margin: 0 auto 2.5rem; padding: 0 2rem; display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- COMPARE MODAL -->
+<div class="modal-overlay" id="compareModal">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <div class="modal-title">Sammenlign øl</div>
+      <button class="modal-close" onclick="closeModal()">Lukk ✕</button>
+    </div>
+    <div id="compareContent"></div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
+    </a>
+    <nav>
+      <a href="index.html">Hjem</a>
+      <a href="all-beers.html" class="active">Alle øl</a>
+      <a href="about.html">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+      <span class="visit-pill" id="visitPill">👁 —</span>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">Samlingen</span>
+  <h1>Alle <em>oppskrifter</em></h1>
+  <p>Bla gjennom, filtrer og sammenlign — finn ditt neste brygg.</p>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-card fade-up"><div class="stat-val">4</div><div class="stat-label">Oppskrifter</div></div>
+  <div class="stat-card fade-up"><div class="stat-val" id="statFavs">0</div><div class="stat-label">Dine favoritter</div></div>
+  <div class="stat-card fade-up"><div class="stat-val" id="statAvgAbv">—</div><div class="stat-label">Snitt ABV</div></div>
+  <div class="stat-card fade-up"><div class="stat-val" id="statCompare">0</div><div class="stat-label">Valgt til sammenl.</div></div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="controls">
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Søk øl..." oninput="render()">
+    </div>
+    <select id="sortBy" onchange="render()">
+      <option value="default">Standard</option>
+      <option value="abv-desc">ABV høy→lav</option>
+      <option value="abv-asc">ABV lav→høy</option>
+      <option value="name">Navn A–Å</option>
+      <option value="ibu-desc">IBU høy→lav</option>
+    </select>
+    <select id="filterAbv" onchange="render()">
+      <option value="all">Alle styrker</option>
+      <option value="low">Under 5%</option>
+      <option value="mid">5–6%</option>
+      <option value="high">Over 6%</option>
+    </select>
+    <button class="tag-btn active" data-tag="alle" onclick="setTag('alle',this)">Alle</button>
+    <button class="tag-btn" data-tag="lys" onclick="setTag('lys',this)">Lys</button>
+    <button class="tag-btn" data-tag="mørk" onclick="setTag('mørk',this)">Mørk</button>
+    <button class="tag-btn" data-tag="frukt" onclick="setTag('frukt',this)">Frukt</button>
+    <button class="tag-btn" data-tag="sesong" onclick="setTag('sesong',this)">Sesong</button>
+    <button class="fav-toggle" id="favToggle" onclick="toggleFavMode()">❤️ Favoritter</button>
+  </div>
+</div>
+
+<div class="beer-grid" id="beerGrid"></div>
+
+<!-- COMPARE BAR -->
+<div class="compare-bar" id="compareBar">
+  <span>Sammenlign:</span>
+  <div id="compareSlots"></div>
+  <button class="compare-btn" id="compareBtn" onclick="openModal()" disabled>Sammenlign →</button>
+</div>
+
+<footer>
+  <p><strong>Brygg &amp; Oppskrifter</strong> — Håndlaget med ❤️ for øl &nbsp;·&nbsp; &copy; 2026</p>
+</footer>
+
+<script>
+const BEERS = [
+  { id:'ginger', name:'Sterk Ginger Beer', abv:6.0, ibu:0, emoji:'🍋', img:'./IMG_4407.jpg',
+    desc:'Frisk, krydret ingefærøl med sitruspreg og balansert sødme.',
+    tags:['lys','frukt'], link:'recipe-ginger-beer.html',
+    sweetness:4, sourness:3, dryness:2,
+    og:'1.070', fg:'1.008', yeast:'Safale US-05', color:'Lys gyllen' },
+  { id:'ipa', name:'Tropisk IPA', abv:6.5, ibu:50, emoji:'🍍', img:'./IMG_4439.jpg',
+    desc:'Humledrevet øl med tropiske frukttoner og frisk bitterhet.',
+    tags:['lys','frukt'], link:'recipe-ipa.html',
+    sweetness:3, sourness:2, dryness:4,
+    og:'1.065', fg:'1.012', yeast:'Safale US-05', color:'Lys gyllen' },
+  { id:'stout', name:'Kremet Stout', abv:5.0, ibu:28, emoji:'☕', img:'./IMG_4285.jpg',
+    desc:'Mørk og fyldig med toner av kaffe, sjokolade og karamell.',
+    tags:['mørk'], link:'recipe-stout.html',
+    sweetness:4, sourness:1, dryness:3,
+    og:'1.052', fg:'1.013', yeast:'SafAle S-04', color:'65 EBC' },
+  { id:'christmas', name:'Juleøl', abv:5.8, ibu:32, emoji:'🎄', img:'',
+    desc:'Klassisk norsk Winter Ale med karamell, tørket frukt og valgfritt julepreg.',
+    tags:['mørk','sesong'], link:'recipe-christmas-ale.html',
+    sweetness:4, sourness:1, dryness:3,
+    og:'1.058', fg:'1.014', yeast:'SafAle US-05 / Wyeast 1728', color:'45 EBC' }
+];
+
+let favs = JSON.parse(localStorage.getItem('brygg_favs')||'[]');
+let compareList = [];
+let activeTag = 'alle';
+let favMode = false;
+
+function getCookie(k){const m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
+function setCookie(k,v,days=365){const d=new Date();d.setDate(d.getDate()+days);document.cookie=k+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/;SameSite=Lax';}
+
+const visits=parseInt(getCookie('brygg_visits')||'0')+1;
+setCookie('brygg_visits',visits);
+document.getElementById('visitPill').textContent='👁 '+visits;
+
+let dark=localStorage.getItem('brygg_dark')==='1';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+applyTheme();
+document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+function toggleFav(id,e){
+  e&&e.stopPropagation();
+  if(favs.includes(id)){favs=favs.filter(f=>f!==id);showToast('Fjernet fra favoritter');}
+  else{favs.push(id);showToast('Lagt til i favoritter! ❤️');}
+  localStorage.setItem('brygg_favs',JSON.stringify(favs));
+  document.getElementById('statFavs').textContent=favs.length;
+  render();
+}
+
+function toggleCompare(id,e){
+  e&&e.stopPropagation();
+  if(compareList.includes(id)){
+    compareList=compareList.filter(c=>c!==id);
+  } else {
+    if(compareList.length>=3){showToast('Maks 3 øl til sammenligning');return;}
+    compareList.push(id);
+  }
+  document.getElementById('statCompare').textContent=compareList.length;
+  updateCompareBar();
+  render();
+}
+
+function updateCompareBar(){
+  const bar=document.getElementById('compareBar');
+  const btn=document.getElementById('compareBtn');
+  const slots=document.getElementById('compareSlots');
+  if(compareList.length===0){bar.classList.remove('show');return;}
+  bar.classList.add('show');
+  btn.disabled=compareList.length<2;
+  slots.innerHTML=compareList.map(id=>{
+    const b=BEERS.find(x=>x.id===id);
+    return `<div class="compare-slot">${b.emoji} ${b.name}<button onclick="toggleCompare('${id}',event)">✕</button></div>`;
+  }).join('');
+}
+
+function setTag(tag,el){
+  activeTag=tag;
+  document.querySelectorAll('.tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.tag===tag));
+  render();
+}
+function toggleFavMode(){favMode=!favMode;document.getElementById('favToggle').classList.toggle('on',favMode);render();}
+
+function barW(n){return Math.round((n/5)*100);}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const sort=document.getElementById('sortBy').value;
+  const abvF=document.getElementById('filterAbv').value;
+
+  let list=BEERS.filter(b=>{
+    if(favMode&&!favs.includes(b.id)) return false;
+    if(activeTag!=='alle'&&!b.tags.includes(activeTag)) return false;
+    if(q&&!b.name.toLowerCase().includes(q)&&!b.desc.toLowerCase().includes(q)) return false;
+    if(abvF==='low'&&b.abv>=5) return false;
+    if(abvF==='mid'&&(b.abv<5||b.abv>6)) return false;
+    if(abvF==='high'&&b.abv<=6) return false;
+    return true;
+  });
+
+  if(sort==='abv-desc') list.sort((a,b)=>b.abv-a.abv);
+  else if(sort==='abv-asc') list.sort((a,b)=>a.abv-b.abv);
+  else if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name,'nb'));
+  else if(sort==='ibu-desc') list.sort((a,b)=>b.ibu-a.ibu);
+
+  const avgAbv=list.length?list.reduce((s,b)=>s+b.abv,0)/list.length:0;
+  document.getElementById('statAvgAbv').textContent=list.length?avgAbv.toFixed(1)+'%':'—';
+  document.getElementById('statFavs').textContent=favs.length;
+
+  const grid=document.getElementById('beerGrid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state"><span style="font-size:3rem;display:block;margin-bottom:.5rem">🍺</span>Ingen øl funnet.</div>';
+    return;
+  }
+
+  grid.innerHTML=list.map((b,i)=>{
+    const isFav=favs.includes(b.id);
+    const inCmp=compareList.includes(b.id);
+    return`<div class="beer-card fade-up" style="animation-delay:${i*.07}s;cursor:pointer" onclick="window.location='${b.link}'">
+      <div class="card-img-wrap">
+        <img src="${b.img}" alt="${b.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">${b.emoji}</div>
+        <span class="card-abv">${b.abv.toFixed(1)}%</span>
+        <button class="card-fav" onclick="toggleFav('${b.id}',event)" aria-label="Favoritt">${isFav?'❤️':'🤍'}</button>
+        <button class="card-compare-check${inCmp?' selected':''}" onclick="toggleCompare('${b.id}',event)" title="Legg til sammenligning">${inCmp?'✓':'+'}</button>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${b.name}</div>
+        <div class="card-desc">${b.desc}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.8rem">
+          <div style="background:var(--bg3);border-radius:8px;padding:.5rem;text-align:center">
+            <div style="font-size:11px;color:var(--muted)">IBU</div>
+            <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--accent)">${b.ibu}</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:.5rem;text-align:center">
+            <div style="font-size:11px;color:var(--muted)">OG</div>
+            <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--accent)">${b.og}</div>
+          </div>
+        </div>
+        <div class="flavor-row"><span class="flavor-label">Sødme</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sweetness)}%"></div></div></div>
+        <div class="flavor-row"><span class="flavor-label">Surhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sourness)}%"></div></div></div>
+        <div class="flavor-row"><span class="flavor-label">Tørrhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.dryness)}%"></div></div></div>
+        <div style="display:flex;gap:5px;margin:.8rem 0 0;flex-wrap:wrap">
+          ${b.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+        </div>
+        <a class="card-cta" href="${b.link}" onclick="event.stopPropagation()">Se oppskrift →</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(){
+  const beers=compareList.map(id=>BEERS.find(b=>b.id===id));
+  const rows=[
+    ['ABV',...beers.map(b=>b.abv.toFixed(1)+'%')],
+    ['IBU',...beers.map(b=>b.ibu)],
+    ['OG',...beers.map(b=>b.og)],
+    ['FG',...beers.map(b=>b.fg)],
+    ['Gjær',...beers.map(b=>b.yeast)],
+    ['Farge',...beers.map(b=>b.color)],
+    ['Sødme',...beers.map(b=>'★'.repeat(b.sweetness)+'☆'.repeat(5-b.sweetness))],
+    ['Surhet',...beers.map(b=>'★'.repeat(b.sourness)+'☆'.repeat(5-b.sourness))],
+    ['Tørrhet',...beers.map(b=>'★'.repeat(b.dryness)+'☆'.repeat(5-b.dryness))],
+  ];
+  document.getElementById('compareContent').innerHTML=`
+    <table class="compare-table">
+      <thead><tr><th></th>${beers.map(b=>`<th><div class="compare-name">${b.emoji} ${b.name}</div></th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr><td style="color:var(--muted);font-size:12px">${r[0]}</td>${r.slice(1).map(v=>`<td style="font-weight:400">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table>`;
+  document.getElementById('compareModal').classList.add('show');
+}
+function closeModal(){document.getElementById('compareModal').classList.remove('show');}
+document.getElementById('compareModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+render();
+</script>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Til toppen">↑</button>
+<script>
+(function(){
+  const btn=document.getElementById("scrollTop");
+  window.addEventListener("scroll",function(){btn.classList.toggle("show",window.scrollY>400);},{passive:true});
+  const ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");ro.unobserve(e.target);}});},{threshold:0.06});
+  document.querySelectorAll(".reveal,.card,.beer-card,.stat-card").forEach(function(el){ro.observe(el);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();var s=document.getElementById("search");if(s)s.focus();}
+    if(e.key==="Escape"){document.activeElement.blur();}
+  });
+})();
+</script>
+</body>
+</html>

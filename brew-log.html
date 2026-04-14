@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brygglogg – Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .log-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+    /* FORM CARD */
+    .log-form { background: var(--bg2); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 1.8rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem; }
+    .log-form h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: var(--bg3); border: 1.5px solid var(--card-border); border-radius: var(--radius-sm);
+      padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+      outline: none; transition: border-color .2s; resize: none;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group.full { grid-column: 1 / -1; }
+    .star-picker { display: flex; gap: 4px; }
+    .star-picker span { font-size: 22px; cursor: pointer; color: var(--bg3); filter: grayscale(1); transition: all .15s; line-height: 1; }
+    .star-picker span.lit { color: var(--warm); filter: none; }
+    .star-picker span:hover ~ span { color: var(--bg3); filter: grayscale(1); }
+    .btn-submit {
+      margin-top: 1rem; width: 100%; padding: 11px;
+      background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn-submit:hover { background: var(--accent2); transform: translateY(-1px); }
+
+    /* STATS ROW */
+    .log-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
+    .log-stat { background: var(--tag-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: .9rem; text-align: center; }
+    .log-stat-val { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .log-stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* FILTERS */
+    .log-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+    .log-controls input[type="text"] {
+      flex: 1; min-width: 180px; padding: 9px 14px 9px 38px;
+      border: 1.5px solid var(--card-border); border-radius: 30px;
+      background: var(--bg2); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; transition: border-color .2s;
+    }
+    .log-controls input[type="text"]:focus { border-color: var(--accent); }
+    .search-rel { position: relative; flex: 1; min-width: 180px; }
+    .search-rel::before { content: '⌕'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 17px; color: var(--muted); pointer-events: none; }
+    .log-controls select { padding: 9px 14px; border: 1.5px solid var(--card-border); border-radius: 30px; background: var(--bg2); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; cursor: pointer; }
+    .btn-clear-all { padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; border: 1.5px solid var(--danger); background: transparent; color: var(--danger); transition: all .2s; font-family: 'DM Sans', sans-serif; }
+    .btn-clear-all:hover { background: var(--danger); color: #fff; }
+
+    /* ENTRIES */
+    .entries-list { display: flex; flex-direction: column; gap: 14px; }
+    .entry-card {
+      background: var(--bg2); border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 1.3rem 1.5rem; box-shadow: var(--shadow-sm);
+      display: grid; grid-template-columns: 1fr auto; gap: .5rem;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .35s ease, transform .35s ease, box-shadow .2s;
+    }
+    .entry-card.visible { opacity: 1; transform: translateY(0); }
+    .entry-card:hover { box-shadow: var(--shadow); }
+    .entry-header { display: flex; align-items: flex-start; gap: 12px; grid-column: 1; }
+    .entry-emoji { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+    .entry-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
+    .entry-meta { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+    .entry-meta span { display: flex; align-items: center; gap: 3px; }
+    .entry-notes { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.6; margin-top: .6rem; grid-column: 1 / -1; padding-top: .6rem; border-top: 1px solid var(--card-border); }
+    .entry-stars { color: var(--warm); font-size: 14px; letter-spacing: 1px; }
+    .entry-actions { grid-column: 2; grid-row: 1; display: flex; gap: 6px; align-items: flex-start; }
+    .btn-del { background: none; border: 1px solid var(--card-border); color: var(--muted); cursor: pointer; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .btn-del:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-edit { background: none; border: 1px solid var(--card-border); color: var(--muted); cursor: pointer; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .btn-edit:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .status-pill { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+    .status-gjær { background: rgba(14,165,233,.12); color: var(--accent); }
+    .status-klar { background: rgba(16,185,129,.12); color: var(--success); }
+    .status-ferdig { background: rgba(245,158,11,.12); color: var(--warm2); }
+    .status-planlagt { background: rgba(90,112,128,.12); color: var(--muted); }
+
+    .empty-log { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-log div { font-size: 3.5rem; margin-bottom: .8rem; }
+
+    /* MODAL EDIT */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal-inner { background: var(--bg2); border-radius: var(--radius-lg); padding: 2rem; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: popIn .3s cubic-bezier(.34,1.2,.64,1); }
+    .modal-inner h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 1.2rem; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 1rem; }
+    .btn-save { flex: 1; padding: 10px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .2s; }
+    .btn-save:hover { background: var(--accent2); }
+    .btn-cancel { padding: 10px 20px; background: none; border: 1.5px solid var(--card-border); color: var(--muted); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all .2s; }
+    .btn-cancel:hover { background: var(--bg3); }
+
+    /* CHART */
+    .chart-wrap { background: var(--bg2); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem; }
+    .chart-wrap h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+    .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+    .bc-row { display: flex; align-items: center; gap: 10px; }
+    .bc-label { font-size: 12px; color: var(--muted); width: 110px; flex-shrink: 0; text-align: right; }
+    .bc-track { flex: 1; height: 10px; background: var(--bg3); border-radius: 5px; overflow: hidden; }
+    .bc-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--accent), var(--warm)); transition: width .7s cubic-bezier(.34,1.2,.64,1); }
+    .bc-val { font-size: 12px; color: var(--muted); width: 24px; }
+
+    @keyframes popIn { from { transform: scale(.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .log-stats { grid-template-columns: repeat(2, 1fr); }
+      .bc-label { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal-inner">
+    <h3>Rediger innlegg</h3>
+    <div class="form-grid" id="editFormGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveEdit()">Lagre endringer</button>
+      <button class="btn-cancel" onclick="closeEdit()">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
+    </a>
+    <nav>
+      <a href="index.html">Hjem</a>
+      <a href="all-beers.html">Alle øl</a>
+      <a href="brew-log.html" class="active">Logg</a>
+      <a href="about.html">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">Din personlige logg</span>
+  <h1>Brygg&shy;<em>loggen</em></h1>
+  <p>Dokumenter hvert brygg — smak, dato, notater og karakter. Alt lagres lokalt i nettleseren din.</p>
+</section>
+
+<div class="log-wrap">
+
+  <!-- STATS -->
+  <div class="log-stats" id="logStats">
+    <div class="log-stat"><div class="log-stat-val" id="ls-total">0</div><div class="log-stat-label">Brygg loggført</div></div>
+    <div class="log-stat"><div class="log-stat-val" id="ls-avg">—</div><div class="log-stat-label">Snittkarakter</div></div>
+    <div class="log-stat"><div class="log-stat-val" id="ls-active">0</div><div class="log-stat-label">Under gjæring</div></div>
+    <div class="log-stat"><div class="log-stat-val" id="ls-best">—</div><div class="log-stat-label">Beste brygg</div></div>
+  </div>
+
+  <!-- CHART (vises når det finnes data) -->
+  <div class="chart-wrap" id="ratingChart" style="display:none">
+    <h3>Karakterfordeling</h3>
+    <div class="bar-chart" id="barChart"></div>
+  </div>
+
+  <!-- NEW ENTRY FORM -->
+  <div class="log-form">
+    <h2>+ Legg til brygg</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Navn på brygg</label>
+        <input type="text" id="f-name" placeholder="f.eks. Tropisk IPA #2" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label>Dato</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>Øltype / stil</label>
+        <select id="f-style">
+          <option value="">Velg stil...</option>
+          <option>IPA</option>
+          <option>Stout / Porter</option>
+          <option>Pale Ale</option>
+          <option>Ginger Beer</option>
+          <option>Wheat / Hefe</option>
+          <option>Lager / Pilsner</option>
+          <option>Sour / Gose</option>
+          <option>Annet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="planlagt">Planlagt</option>
+          <option value="gjær">Under gjæring</option>
+          <option value="klar">Klar til å tappe</option>
+          <option value="ferdig">Ferdig / Drukket</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ABV %</label>
+        <input type="number" id="f-abv" placeholder="f.eks. 6.2" step="0.1" min="0" max="20">
+      </div>
+      <div class="form-group">
+        <label>Batch (liter)</label>
+        <input type="number" id="f-batch" placeholder="f.eks. 20" step="1" min="1">
+      </div>
+      <div class="form-group full">
+        <label>Karakter (klikk for å sette)</label>
+        <div class="star-picker" id="starPicker">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span>
+          <span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Notater</label>
+        <textarea id="f-notes" rows="3" placeholder="Smak, aroma, hva vil du gjøre annerledes neste gang..."></textarea>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="addEntry()">Loggfør brygg →</button>
+  </div>
+
+  <!-- FILTER / SORT -->
+  <div class="log-controls">
+    <div class="search-rel">
+      <input type="text" id="logSearch" placeholder="Søk i loggen..." oninput="renderEntries()">
+    </div>
+    <select id="logSort" onchange="renderEntries()">
+      <option value="newest">Nyeste først</option>
+      <option value="oldest">Eldste først</option>
+      <option value="rating-desc">Høyest karakter</option>
+      <option value="rating-asc">Lavest karakter</option>
+      <option value="name">Navn A–Å</option>
+    </select>
+    <select id="logStatus" onchange="renderEntries()">
+      <option value="all">Alle statuser</option>
+      <option value="planlagt">Planlagt</option>
+      <option value="gjær">Under gjæring</option>
+      <option value="klar">Klar</option>
+      <option value="ferdig">Ferdig</option>
+    </select>
+    <button class="btn-clear-all" onclick="confirmClearAll()">Slett alt</button>
+  </div>
+
+  <div class="entries-list" id="entriesList"></div>
+
+</div>
+
+<footer>
+  <p><strong>Brygg &amp; Oppskrifter</strong> — Håndlaget med ❤️ for øl &nbsp;·&nbsp; &copy; 2026</p>
+</footer>
+
+<script>
+// ---- THEME ----
+let dark = localStorage.getItem('brygg_dark') === '1';
+function applyTheme(){ document.documentElement.setAttribute('data-theme', dark?'dark':'light'); document.getElementById('themeBtn').textContent = dark?'☀️ Lys':'🌙 Mørk'; }
+applyTheme();
+document.getElementById('themeBtn').onclick = () => { dark=!dark; localStorage.setItem('brygg_dark',dark?'1':'0'); applyTheme(); };
+
+// ---- TOAST ----
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+// ---- DATA ----
+let entries = JSON.parse(localStorage.getItem('brygg_log') || '[]');
+function save(){ localStorage.setItem('brygg_log', JSON.stringify(entries)); }
+
+// ---- STAR PICKER ----
+let selectedRating = 0;
+let editSelectedRating = 0;
+
+function initStarPicker(containerId, onSet){
+  const stars = document.querySelectorAll(`#${containerId} span`);
+  stars.forEach(s => {
+    s.addEventListener('mouseover', () => {
+      const v = parseInt(s.dataset.v);
+      stars.forEach(x => x.classList.toggle('lit', parseInt(x.dataset.v) <= v));
+    });
+    s.addEventListener('mouseout', () => {
+      const cur = onSet('get');
+      stars.forEach(x => x.classList.toggle('lit', parseInt(x.dataset.v) <= cur));
+    });
+    s.addEventListener('click', () => {
+      const v = parseInt(s.dataset.v);
+      onSet('set', v);
+      stars.forEach(x => x.classList.toggle('lit', parseInt(x.dataset.v) <= v));
+    });
+  });
+}
+
+initStarPicker('starPicker', (action, val) => {
+  if(action==='set') selectedRating = val;
+  return selectedRating;
+});
+
+// ---- SET DEFAULT DATE ----
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+// ---- ADD ENTRY ----
+function addEntry(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name){ showToast('Skriv inn navn på brygg'); document.getElementById('f-name').focus(); return; }
+  const entry = {
+    id: Date.now(),
+    name,
+    date: document.getElementById('f-date').value,
+    style: document.getElementById('f-style').value,
+    status: document.getElementById('f-status').value,
+    abv: parseFloat(document.getElementById('f-abv').value) || null,
+    batch: parseInt(document.getElementById('f-batch').value) || null,
+    rating: selectedRating,
+    notes: document.getElementById('f-notes').value.trim(),
+  };
+  entries.unshift(entry);
+  save();
+  // reset form
+  ['f-name','f-abv','f-batch','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-style').value = '';
+  document.getElementById('f-status').value = 'gjær';
+  selectedRating = 0;
+  document.querySelectorAll('#starPicker span').forEach(s => s.classList.remove('lit'));
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  showToast('Brygg loggført! 🍺');
+  renderEntries();
+  updateStats();
+}
+
+// ---- RENDER ENTRIES ----
+function renderEntries(){
+  const q = document.getElementById('logSearch').value.toLowerCase().trim();
+  const sort = document.getElementById('logSort').value;
+  const statusF = document.getElementById('logStatus').value;
+
+  let list = entries.filter(e => {
+    if(statusF !== 'all' && e.status !== statusF) return false;
+    if(q && !e.name.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q) && !(e.style||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if(sort === 'oldest') list = [...list].sort((a,b) => a.date.localeCompare(b.date));
+  else if(sort === 'rating-desc') list = [...list].sort((a,b) => (b.rating||0)-(a.rating||0));
+  else if(sort === 'rating-asc') list = [...list].sort((a,b) => (a.rating||0)-(b.rating||0));
+  else if(sort === 'name') list = [...list].sort((a,b) => a.name.localeCompare(b.name,'nb'));
+
+  const container = document.getElementById('entriesList');
+  if(!list.length){
+    container.innerHTML = `<div class="empty-log"><div>📓</div>${entries.length ? 'Ingen treff på søket.' : 'Ingen brygg loggført ennå.<br>Fyll inn skjemaet over og start loggen!'}</div>`;
+    return;
+  }
+
+  const statusLabel = { planlagt:'Planlagt', gjær:'Under gjæring', klar:'Klar', ferdig:'Ferdig' };
+  const beerEmoji = s => ({IPA:'🍍','Stout / Porter':'☕','Pale Ale':'🌾','Ginger Beer':'🍋','Wheat / Hefe':'🌾','Lager / Pilsner':'🍺','Sour / Gose':'🍋'}[s] || '🍺');
+
+  container.innerHTML = list.map(e => {
+    const stars = e.rating ? '★'.repeat(e.rating) + '☆'.repeat(5-e.rating) : '–';
+    const dateStr = e.date ? new Date(e.date+'T12:00').toLocaleDateString('nb-NO',{day:'numeric',month:'short',year:'numeric'}) : '–';
+    return `<div class="entry-card" id="ec-${e.id}">
+      <div class="entry-header">
+        <span class="entry-emoji">${beerEmoji(e.style)}</span>
+        <div>
+          <div class="entry-title">${e.name}</div>
+          <div class="entry-meta">
+            <span>📅 ${dateStr}</span>
+            ${e.style ? `<span>🏷 ${e.style}</span>` : ''}
+            ${e.abv ? `<span>💪 ${e.abv}%</span>` : ''}
+            ${e.batch ? `<span>🪣 ${e.batch}L</span>` : ''}
+            <span class="status-pill status-${e.status}">${statusLabel[e.status]||e.status}</span>
+          </div>
+          ${e.rating ? `<div class="entry-stars" style="margin-top:4px">${stars}</div>` : ''}
+        </div>
+      </div>
+      <div class="entry-actions">
+        <button class="btn-edit" onclick="openEdit(${e.id})" title="Rediger">✎</button>
+        <button class="btn-del" onclick="deleteEntry(${e.id})" title="Slett">✕</button>
+      </div>
+      ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Trigger IntersectionObserver
+  setTimeout(() => {
+    document.querySelectorAll('.entry-card').forEach(c => observer.observe(c));
+  }, 10);
+}
+
+// ---- DELETE ----
+function deleteEntry(id){
+  entries = entries.filter(e => e.id !== id);
+  save(); renderEntries(); updateStats();
+  showToast('Slettet');
+}
+
+function confirmClearAll(){
+  if(!entries.length) return showToast('Ingen innlegg å slette');
+  if(confirm(`Slette alle ${entries.length} innlegg? Dette kan ikke angres.`)){
+    entries = []; save(); renderEntries(); updateStats();
+    showToast('Loggen er tømt');
+  }
+}
+
+// ---- EDIT ----
+let editId = null;
+function openEdit(id){
+  const e = entries.find(x => x.id === id);
+  if(!e) return;
+  editId = id;
+  editSelectedRating = e.rating || 0;
+  document.getElementById('editFormGrid').innerHTML = `
+    <div class="form-group"><label>Navn</label><input type="text" id="e-name" value="${e.name}" maxlength="60"></div>
+    <div class="form-group"><label>Dato</label><input type="date" id="e-date" value="${e.date||''}"></div>
+    <div class="form-group"><label>Stil</label>
+      <select id="e-style">
+        ${['','IPA','Stout / Porter','Pale Ale','Ginger Beer','Wheat / Hefe','Lager / Pilsner','Sour / Gose','Annet'].map(s=>`<option${s===e.style?' selected':''}>${s}</option>`).join('')}
+      </select></div>
+    <div class="form-group"><label>Status</label>
+      <select id="e-status">
+        ${['planlagt','gjær','klar','ferdig'].map(s=>`<option value="${s}"${s===e.status?' selected':''}>${{planlagt:'Planlagt',gjær:'Under gjæring',klar:'Klar',ferdig:'Ferdig'}[s]}</option>`).join('')}
+      </select></div>
+    <div class="form-group"><label>ABV %</label><input type="number" id="e-abv" value="${e.abv||''}" step="0.1" min="0" max="20"></div>
+    <div class="form-group"><label>Batch (L)</label><input type="number" id="e-batch" value="${e.batch||''}" step="1" min="1"></div>
+    <div class="form-group full"><label>Karakter</label>
+      <div class="star-picker" id="editStarPicker">
+        ${[1,2,3,4,5].map(v=>`<span data-v="${v}" class="${v<=editSelectedRating?'lit':''}"  >★</span>`).join('')}
+      </div></div>
+    <div class="form-group full"><label>Notater</label><textarea id="e-notes" rows="3">${e.notes||''}</textarea></div>
+  `;
+  initStarPicker('editStarPicker', (action, val) => {
+    if(action==='set') editSelectedRating = val;
+    return editSelectedRating;
+  });
+  document.getElementById('editModal').classList.add('show');
+}
+
+function saveEdit(){
+  const e = entries.find(x => x.id === editId);
+  if(!e) return;
+  e.name = document.getElementById('e-name').value.trim() || e.name;
+  e.date = document.getElementById('e-date').value;
+  e.style = document.getElementById('e-style').value;
+  e.status = document.getElementById('e-status').value;
+  e.abv = parseFloat(document.getElementById('e-abv').value) || null;
+  e.batch = parseInt(document.getElementById('e-batch').value) || null;
+  e.rating = editSelectedRating;
+  e.notes = document.getElementById('e-notes').value.trim();
+  save(); renderEntries(); updateStats();
+  closeEdit(); showToast('Endringer lagret ✓');
+}
+function closeEdit(){ document.getElementById('editModal').classList.remove('show'); }
+document.getElementById('editModal').addEventListener('click', e => { if(e.target === document.getElementById('editModal')) closeEdit(); });
+
+// ---- STATS ----
+function updateStats(){
+  document.getElementById('ls-total').textContent = entries.length;
+  const rated = entries.filter(e => e.rating > 0);
+  document.getElementById('ls-avg').textContent = rated.length ? (rated.reduce((s,e)=>s+e.rating,0)/rated.length).toFixed(1) : '—';
+  document.getElementById('ls-active').textContent = entries.filter(e => e.status==='gjær').length;
+  const best = entries.filter(e=>e.rating>0).sort((a,b)=>b.rating-a.rating)[0];
+  document.getElementById('ls-best').textContent = best ? best.name.split(' ')[0] : '—';
+
+  // Rating chart
+  const chart = document.getElementById('ratingChart');
+  if(!rated.length){ chart.style.display='none'; return; }
+  chart.style.display='block';
+  const counts = [1,2,3,4,5].map(r => rated.filter(e=>e.rating===r).length);
+  const maxC = Math.max(...counts, 1);
+  document.getElementById('barChart').innerHTML = [5,4,3,2,1].map(r => {
+    const c = rated.filter(e=>e.rating===r).length;
+    const pct = Math.round((c/maxC)*100);
+    return `<div class="bc-row">
+      <div class="bc-label">${'★'.repeat(r)}${'☆'.repeat(5-r)}</div>
+      <div class="bc-track"><div class="bc-fill" style="width:${pct}%"></div></div>
+      <div class="bc-val">${c}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- INTERSECTION OBSERVER ----
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.05 });
+
+// ---- KEYBOARD SHORTCUT ----
+document.addEventListener('keydown', e => {
+  if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){
+    e.preventDefault(); document.getElementById('logSearch').focus();
+  }
+  if(e.key === 'Escape'){ closeEdit(); document.getElementById('logSearch').blur(); }
+});
+
+// ---- INIT ----
+renderEntries();
+updateStats();
+</script>
+</body>
+</html>

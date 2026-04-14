@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Om oss – Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .about-main {
+      max-width: 860px; margin: 0 auto; padding: 2rem 2rem 5rem;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-top: .5rem;
+    }
+    .feature-item {
+      background: var(--bg3); border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm); padding: 1rem; text-align: center;
+      transition: transform .2s;
+    }
+    .feature-item:hover { transform: translateY(-2px); }
+    .feature-icon { font-size: 26px; margin-bottom: .4rem; display: block; }
+    .feature-label { font-size: 13px; font-weight: 500; }
+    .feature-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .timeline { display: flex; flex-direction: column; margin-top: .5rem; }
+    .tl-item { display: flex; gap: 1rem; padding: .85rem 0; }
+    .tl-item + .tl-item { border-top: 1px solid var(--card-border); }
+    .tl-dot {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .tl-text strong { font-size: 14px; font-weight: 500; display: block; margin-bottom: 2px; }
+    .tl-text span { font-size: 13px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+    .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: .5rem; }
+    .stat-chip {
+      flex: 1; min-width: 100px; background: var(--tag-bg);
+      border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: .9rem; text-align: center;
+    }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    .stat-lab { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .cta-card {
+      background: var(--header-bg) !important; border: none !important;
+      text-align: center;
+    }
+    .cta-card h2 { color: #fff !important; }
+    .cta-card p { color: rgba(255,255,255,.7) !important; font-size: .95rem; font-weight: 300; }
+    .cta-btn {
+      display: inline-block; margin-top: 1.2rem;
+      background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.3);
+      color: #fff; text-decoration: none; padding: 10px 24px;
+      border-radius: 30px; font-size: 14px; font-weight: 500; transition: all .2s;
+    }
+    .cta-btn:hover { background: rgba(255,255,255,.25); transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div>
+        <div class="logo-text">Brygg &amp; Oppskrifter</div>
+        <div class="logo-sub">Hjemmebrygg</div>
+      </div>
+    </a>
+    <nav>
+      <a href="index.html">Hjem</a>
+      <a href="all-beers.html">Alle øl</a>
+      <a href="brew-log.html">Logg</a>
+      <a href="about.html" class="active">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">Om prosjektet</span>
+  <h1>Brygging er en <em>kunst</em></h1>
+  <p>For hjemmebryggere av hjemmebryggere – oppskrifter som faktisk funker.</p>
+</section>
+
+<main class="about-main">
+
+  <div class="card fade-up">
+    <h2>Hva er dette?</h2>
+    <p style="color:var(--muted);line-height:1.8;font-weight:300;font-size:.95rem">
+      Brygg &amp; Oppskrifter er et personlig prosjekt for deg som vil brygge eget øl hjemme.
+      Her finner du gjennomtestede oppskrifter – alt fra frisk ginger beer til klassisk juleøl –
+      med detaljerte steg-for-steg-instruksjoner.
+    </p>
+  </div>
+
+  <div class="card fade-up">
+    <h2>Hva du finner her</h2>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <span class="feature-icon">📋</span>
+        <div class="feature-label">Sjekklister</div>
+        <div class="feature-sub">Interaktive bryggeguider</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📊</span>
+        <div class="feature-label">Smaksprofiler</div>
+        <div class="feature-sub">Sødme, surhet, tørrhet</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">❤️</span>
+        <div class="feature-label">Favoritter</div>
+        <div class="feature-sub">Lagre dine favoritter</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">⚖️</span>
+        <div class="feature-label">Sammenlign</div>
+        <div class="feature-sub">Sammenlign øl side om side</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🌙</span>
+        <div class="feature-label">Mørk modus</div>
+        <div class="feature-sub">Brygg i mørket</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📈</span>
+        <div class="feature-label">Statistikk</div>
+        <div class="feature-sub">Følg din bryggereise</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fade-up">
+    <h2>Din bryggereise</h2>
+    <div class="stats-row">
+      <div class="stat-chip">
+        <div class="stat-num" id="statVisits">—</div>
+        <div class="stat-lab">Totale besøk</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="statFavs">—</div>
+        <div class="stat-lab">Dine favoritter</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="statProgress">—</div>
+        <div class="stat-lab">Steg fullført</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="statLastSeen" style="font-size:1.1rem;line-height:1.8">—</div>
+        <div class="stat-lab">Sist besøkt</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fade-up">
+    <h2>Slik brygger du</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">🌾</div>
+        <div class="tl-text">
+          <strong>Velg en oppskrift</strong>
+          <span>Finn noe som frister – fra frisk og lett til mørk og fyldig.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">🛒</div>
+        <div class="tl-text">
+          <strong>Skaff ingredienser</strong>
+          <span>Alt du trenger finner du hos en lokal hjemmebryggbutikk.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">🔥</div>
+        <div class="tl-text">
+          <strong>Bryggedagen</strong>
+          <span>Følg sjekklisten steg for steg – hak av etterhvert som du går.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">⏳</div>
+        <div class="tl-text">
+          <strong>Gjæring og modning</strong>
+          <span>Tålmodighet er en dyd. La ølet gjøre jobben selv.</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">🍺</div>
+        <div class="tl-text">
+          <strong>Nyt resultatet</strong>
+          <span>Ingenting smaker bedre enn noe du har laget selv.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card cta-card fade-up">
+    <h2>Klar til å brygge?</h2>
+    <p>Utforsk alle oppskriftene og finn din neste favoritt.</p>
+    <a href="index.html" class="cta-btn">Se oppskriftene →</a>
+  </div>
+
+</main>
+
+<footer>
+  <p><strong>Brygg &amp; Oppskrifter</strong> — Håndlaget med ❤️ for øl &nbsp;·&nbsp; &copy; 2026</p>
+</footer>
+
+<script>
+function getCookie(k){const m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
+function setCookie(k,v,days=365){const d=new Date();d.setDate(d.getDate()+days);document.cookie=k+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/;SameSite=Lax';}
+
+const visits=parseInt(getCookie('brygg_visits')||'0')+1;
+setCookie('brygg_visits',visits);
+document.getElementById('statVisits').textContent=visits;
+
+const favs=JSON.parse(localStorage.getItem('brygg_favs')||'[]');
+document.getElementById('statFavs').textContent=favs.length;
+
+// Count total completed checklist steps across all recipes
+const keys=['brygg_check_ginger','brygg_check_ipa','brygg_check_stout','brygg_check_christmas'];
+const totalDone=keys.reduce((sum,k)=>{
+  const c=JSON.parse(localStorage.getItem(k)||'{}');
+  return sum+Object.values(c).filter(Boolean).length;
+},0);
+document.getElementById('statProgress').textContent=totalDone;
+
+const last=getCookie('brygg_last');
+document.getElementById('statLastSeen').textContent=last||'I dag';
+setCookie('brygg_last',new Date().toLocaleDateString('nb-NO'));
+
+let dark=localStorage.getItem('brygg_dark')==='1';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+applyTheme();
+document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+</script>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Til toppen">↑</button>
+<script>
+(function(){
+  const btn=document.getElementById("scrollTop");
+  window.addEventListener("scroll",function(){btn.classList.toggle("show",window.scrollY>400);},{passive:true});
+  const ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");ro.unobserve(e.target);}});},{threshold:0.06});
+  document.querySelectorAll(".reveal,.card,.beer-card,.stat-card").forEach(function(el){ro.observe(el);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();var s=document.getElementById("search");if(s)s.focus();}
+    if(e.key==="Escape"){document.activeElement.blur();}
+  });
+})();
+</script>
+</body>
+</html>

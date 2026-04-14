@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stats-bar {
+      max-width: 1200px; margin: 0 auto 2.5rem; padding: 0 2rem;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .controls-wrap {
+      max-width: 1200px; margin: 0 auto 1.5rem; padding: 0 2rem;
+    }
+    .beer-grid {
+      max-width: 1200px; margin: 0 auto 5rem; padding: 0 2rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 20px;
+    }
+    .empty-state {
+      text-align: center; padding: 4rem; color: var(--muted);
+      grid-column: 1/-1;
+    }
+    .card-viewed { font-size: 10px; color: var(--muted); margin-top: 6px; text-align: right; }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div>
+        <div class="logo-text">Brygg &amp; Oppskrifter</div>
+        <div class="logo-sub">Hjemmebrygg</div>
+      </div>
+    </a>
+    <nav>
+      <a href="index.html" class="active">Hjem</a>
+      <a href="all-beers.html">Alle øl</a>
+      <a href="brew-log.html">Logg</a>
+      <a href="about.html">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+      <span class="visit-pill" id="visitPill">👁 —</span>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">Hjemmebryggeri</span>
+  <h1>Brygget med <em>kjærlighet</em></h1>
+  <p>Utforsk oppskrifter, lagre favoritter og lag ditt eget øl — steg for steg.</p>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-card fade-up">
+    <div class="stat-val" id="statRecipes">4</div>
+    <div class="stat-label">Oppskrifter</div>
+  </div>
+  <div class="stat-card fade-up">
+    <div class="stat-val" id="statFavs">0</div>
+    <div class="stat-label">Dine favoritter</div>
+  </div>
+  <div class="stat-card fade-up">
+    <div class="stat-val" id="statVisits">1</div>
+    <div class="stat-label">Besøk</div>
+  </div>
+</div>
+
+<div class="controls-wrap">
+  <div class="controls">
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Søk oppskrifter..." oninput="render()">
+    </div>
+    <select id="sortBy" onchange="render()">
+      <option value="default">Standard rekkefølge</option>
+      <option value="abv-asc">ABV lav → høy</option>
+      <option value="abv-desc">ABV høy → lav</option>
+      <option value="name">Navn A–Å</option>
+    </select>
+    <button class="tag-btn active" data-tag="alle" onclick="setTag('alle')">Alle</button>
+    <button class="tag-btn" data-tag="lys" onclick="setTag('lys')">Lys</button>
+    <button class="tag-btn" data-tag="mørk" onclick="setTag('mørk')">Mørk</button>
+    <button class="tag-btn" data-tag="frukt" onclick="setTag('frukt')">Frukt</button>
+    <button class="tag-btn" data-tag="sesong" onclick="setTag('sesong')">Sesong</button>
+    <button class="fav-toggle" id="favToggle" onclick="toggleFavMode()">❤️ Favoritter</button>
+  </div>
+</div>
+
+<div class="beer-grid" id="beerGrid"></div>
+
+<footer>
+  <p><strong>Brygg &amp; Oppskrifter</strong> — Håndlaget med ❤️ for øl &nbsp;·&nbsp; &copy; 2026</p>
+  <p style="margin-top:6px;font-size:11px;opacity:.5">Sist besøkt: <span id="lastVisit">—</span></p>
+</footer>
+
+<script>
+const BEERS = [
+  { id:'ginger', name:'Sterk Ginger Beer', abv:6.0, emoji:'🍋', img:'./IMG_4407.jpg',
+    desc:'Frisk, krydret ingefærøl med sitruspreg og balansert sødme.',
+    tags:['lys','frukt'], link:'recipe-ginger-beer.html', sweetness:4, sourness:3, dryness:2 },
+  { id:'ipa', name:'Tropisk IPA', abv:6.5, emoji:'🍍', img:'./IMG_4439.jpg',
+    desc:'Humledrevet øl med tropiske frukttoner og frisk bitterhet.',
+    tags:['lys','frukt'], link:'recipe-ipa.html', sweetness:3, sourness:2, dryness:4 },
+  { id:'stout', name:'Kremet Stout', abv:5.0, emoji:'☕', img:'./IMG_4285.jpg',
+    desc:'Mørk og fyldig med toner av kaffe, sjokolade og karamell.',
+    tags:['mørk'], link:'recipe-stout.html', sweetness:4, sourness:1, dryness:3 },
+  { id:'christmas', name:'Juleøl', abv:5.8, emoji:'🎄', img:'',
+    desc:'Klassisk norsk Winter Ale med karamell, tørket frukt og valgfritt julepreg.',
+    tags:['mørk','sesong'], link:'recipe-christmas-ale.html', sweetness:4, sourness:1, dryness:3 }
+];
+
+function getCookie(k){const m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
+function setCookie(k,v,days=365){const d=new Date();d.setDate(d.getDate()+days);document.cookie=k+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/;SameSite=Lax';}
+
+let favs = JSON.parse(localStorage.getItem('brygg_favs')||'[]');
+let viewCounts = JSON.parse(localStorage.getItem('brygg_views')||'{}');
+let activeTag = 'alle';
+let favMode = false;
+
+const visits = parseInt(getCookie('brygg_visits')||'0') + 1;
+setCookie('brygg_visits', visits);
+document.getElementById('visitPill').textContent = '👁 ' + visits + ' besøk';
+document.getElementById('statVisits').textContent = visits;
+const lastVisit = getCookie('brygg_last');
+if (lastVisit) document.getElementById('lastVisit').textContent = lastVisit;
+setCookie('brygg_last', new Date().toLocaleDateString('nb-NO'));
+
+let dark = localStorage.getItem('brygg_dark') === '1';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+applyTheme();
+document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+function toggleFav(id, e){
+  e&&e.stopPropagation();
+  if(favs.includes(id)){favs=favs.filter(f=>f!==id);showToast('Fjernet fra favoritter');}
+  else{favs.push(id);showToast('Lagt til i favoritter! ❤️');}
+  localStorage.setItem('brygg_favs',JSON.stringify(favs));
+  document.getElementById('statFavs').textContent=favs.length;
+  render();
+}
+
+function setTag(tag){
+  activeTag=tag;
+  document.querySelectorAll('.tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.tag===tag));
+  render();
+}
+
+function toggleFavMode(){favMode=!favMode;document.getElementById('favToggle').classList.toggle('on',favMode);render();}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const sort=document.getElementById('sortBy').value;
+  let list=BEERS.filter(b=>{
+    if(favMode&&!favs.includes(b.id)) return false;
+    if(activeTag!=='alle'&&!b.tags.includes(activeTag)) return false;
+    if(q&&!b.name.toLowerCase().includes(q)&&!b.desc.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(sort==='abv-asc') list.sort((a,b)=>a.abv-b.abv);
+  else if(sort==='abv-desc') list.sort((a,b)=>b.abv-a.abv);
+  else if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name,'nb'));
+
+  const grid=document.getElementById('beerGrid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state"><span style="font-size:3rem;display:block;margin-bottom:.5rem">🍺</span>Ingen øl funnet – prøv et annet søk.</div>';
+    return;
+  }
+  grid.innerHTML=list.map((b,i)=>{
+    const isFav=favs.includes(b.id);
+    const views=viewCounts[b.id]||0;
+    const barW=n=>Math.round((n/5)*100);
+    return`<div class="beer-card fade-up" style="animation-delay:${i*.07}s;cursor:pointer" onclick="trackView('${b.id}','${b.link}')">
+      <div class="card-img-wrap">
+        <img src="${b.img}" alt="${b.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">${b.emoji}</div>
+        <span class="card-abv">${b.abv.toFixed(1)}%</span>
+        <button class="card-fav" onclick="toggleFav('${b.id}',event)" aria-label="Favoritt">${isFav?'❤️':'🤍'}</button>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${b.name}</div>
+        <div class="card-desc">${b.desc}</div>
+        <div class="flavor-row"><span class="flavor-label">Sødme</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sweetness)}%"></div></div></div>
+        <div class="flavor-row"><span class="flavor-label">Surhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sourness)}%"></div></div></div>
+        <div class="flavor-row"><span class="flavor-label">Tørrhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.dryness)}%"></div></div></div>
+        <div style="display:flex;gap:5px;margin:.8rem 0 0;flex-wrap:wrap">${b.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <a class="card-cta" href="${b.link}" onclick="event.stopPropagation()">Se oppskrift →</a>
+        ${views?`<div class="card-viewed">Sett ${views} gang${views===1?'':'er'}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('statFavs').textContent=favs.length;
+}
+
+function trackView(id, link){
+  viewCounts[id]=(viewCounts[id]||0)+1;
+  localStorage.setItem('brygg_views',JSON.stringify(viewCounts));
+  window.location=link;
+}
+
+render();
+</script>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Til toppen">↑</button>
+<script>
+(function(){
+  const btn=document.getElementById("scrollTop");
+  window.addEventListener("scroll",function(){btn.classList.toggle("show",window.scrollY>400);},{passive:true});
+  const ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");ro.unobserve(e.target);}});},{threshold:0.06});
+  document.querySelectorAll(".reveal,.card,.beer-card,.stat-card").forEach(function(el){ro.observe(el);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();var s=document.getElementById("search");if(s)s.focus();}
+    if(e.key==="Escape"){document.activeElement.blur();}
+  });
+})();
+</script>
+</body>
+</html>

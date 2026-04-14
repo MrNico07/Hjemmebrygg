@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kremet Stout – Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
+    </a>
+    <nav>
+      <a href="index.html">Hjem</a>
+      <a href="all-beers.html">Alle øl</a>
+      <a href="brew-log.html">Logg</a>
+      <a href="about.html">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+    </nav>
+  </div>
+</header>
+
+<section class="recipe-hero">
+  <span class="recipe-emoji">☕</span>
+  <h1>Kremet Stout</h1>
+  <p>Mørk, fyldig og silkemyk — 5% ABV</p>
+  <div style="margin-top:1rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <span class="tag">mørk</span><span class="tag">5% ABV</span><span class="tag">28 IBU</span><span class="tag">65 EBC</span><span class="tag">20L batch</span>
+  </div>
+</section>
+
+<div class="recipe-grid">
+  <a href="index.html" class="back-link fade-up">← Tilbake til oppskrifter</a>
+
+  <!-- NØKKELVERDIER -->
+  <div class="card fade-up">
+    <h2>Nøkkelverdier</h2>
+    <div class="kv-grid">
+      <div class="kv-chip"><div class="kv-val">20L</div><div class="kv-label">Batch</div></div>
+      <div class="kv-chip"><div class="kv-val">1.052</div><div class="kv-label">OG</div></div>
+      <div class="kv-chip"><div class="kv-val">1.013</div><div class="kv-label">FG</div></div>
+      <div class="kv-chip"><div class="kv-val">~5,1%</div><div class="kv-label">ABV</div></div>
+      <div class="kv-chip"><div class="kv-val">28</div><div class="kv-label">IBU</div></div>
+      <div class="kv-chip"><div class="kv-val">65 EBC</div><div class="kv-label">Farge</div></div>
+    </div>
+  </div>
+
+  <!-- SMAKSPROFIL -->
+  <div class="card fade-up">
+    <h2>Smaksprofil</h2>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:.5rem">
+      <div class="flavor-row"><span class="flavor-label">Sødme</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:80%"></div></div><span style="font-size:12px;color:var(--muted);margin-left:6px">4/5</span></div>
+      <div class="flavor-row"><span class="flavor-label">Surhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:20%"></div></div><span style="font-size:12px;color:var(--muted);margin-left:6px">1/5</span></div>
+      <div class="flavor-row"><span class="flavor-label">Tørrhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:60%"></div></div><span style="font-size:12px;color:var(--muted);margin-left:6px">3/5</span></div>
+      <div class="flavor-row"><span class="flavor-label">Kropp</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:90%"></div></div><span style="font-size:12px;color:var(--muted);margin-left:6px">5/5</span></div>
+    </div>
+    <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="sensory-item"><div class="sensory-key">Aroma</div><div class="sensory-val">Kaffe, sjokolade</div></div>
+      <div class="sensory-item"><div class="sensory-key">Smak</div><div class="sensory-val">Rund og fyldig</div></div>
+      <div class="sensory-item"><div class="sensory-key">Munnfølelse</div><div class="sensory-val">Kremet, silkemyk</div></div>
+      <div class="sensory-item"><div class="sensory-key">Finish</div><div class="sensory-val">Lett tørr, ristet</div></div>
+    </div>
+  </div>
+
+  <!-- MALTBASE -->
+  <div class="card fade-up">
+    <h2>Maltbase</h2>
+    <div style="margin-top:.5rem">
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Pale Ale malt</span><span class="ing-amount">3,8 kg</span></div>
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Flaket bygg</span><span class="ing-amount">0,5 kg</span></div>
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Crystal malt</span><span class="ing-amount">0,4 kg</span></div>
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Chocolate malt</span><span class="ing-amount">0,25 kg</span></div>
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Ristet bygg</span><span class="ing-amount">0,15 kg</span></div>
+      <div class="ing-item"><span class="ing-icon">🌾</span><span class="ing-name">Carafa Special II</span><span class="ing-amount">0,1 kg (valgfri)</span></div>
+    </div>
+  </div>
+
+  <!-- HUMLE & GJÆR -->
+  <div class="card fade-up" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div>
+      <h2>Humle</h2>
+      <div style="margin-top:.5rem">
+        <div class="ing-item"><span class="ing-icon">🌿</span><span class="ing-name">East Kent Goldings</span><span class="ing-amount">25 g · 60 min</span></div>
+        <div class="ing-item"><span class="ing-icon">🌿</span><span class="ing-name">East Kent Goldings</span><span class="ing-amount">15 g · 15 min</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-weight:300;margin-top:.5rem;line-height:1.5">Mild, balansert bitterhet på ~28 IBU.</div>
+    </div>
+    <div>
+      <h2>Gjær</h2>
+      <div style="margin-top:.5rem">
+        <div class="ing-item"><span class="ing-icon">🧫</span><span class="ing-name">SafAle S-04</span></div>
+        <div style="padding:.5rem .5rem;font-size:13px;color:var(--muted);font-weight:300">eller</div>
+        <div class="ing-item"><span class="ing-icon">🧫</span><span class="ing-name">Wyeast 1084</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TILSETNINGER -->
+  <div class="card fade-up">
+    <h2>Tilsetninger <span style="font-size:13px;font-weight:400;color:var(--muted)">(valgfritt)</span></h2>
+    <div style="margin-top:.5rem">
+      <div class="ing-item"><span class="ing-icon">🥛</span><span class="ing-name">Laktose — mer kremet sødme</span><span class="ing-amount">100 g</span></div>
+      <div class="ing-item"><span class="ing-icon">🌿</span><span class="ing-name">Vaniljestang — milk stout-preg</span><span class="ing-amount">1 stk</span></div>
+    </div>
+  </div>
+
+  <!-- BRYGGEPROSESS -->
+  <div class="card fade-up">
+    <h2>Bryggeprosess</h2>
+    <div style="margin-bottom:.8rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+        <span style="font-size:13px;color:var(--muted)" id="progressText">0 av 7 steg fullført</span>
+        <button onclick="resetChecks()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--card-border);padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif">Nullstill</button>
+      </div>
+      <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div id="checklist">
+      <div class="check-item" onclick="toggleCheck(this,0)"><div class="check-box" id="cb0"></div><span class="check-text">Mesk på 67°C i 60 min</span></div>
+      <div class="check-item" onclick="toggleCheck(this,1)"><div class="check-box" id="cb1"></div><span class="check-text">Mash-out på 75°C i 10 min</span></div>
+      <div class="check-item" onclick="toggleCheck(this,2)"><div class="check-box" id="cb2"></div><span class="check-text">Kok i 60 min og tilsett humle etter skjema</span></div>
+      <div class="check-item" onclick="toggleCheck(this,3)"><div class="check-box" id="cb3"></div><span class="check-text">Tilsett laktose (+ vanilje) siste 10 min (valgfritt)</span></div>
+      <div class="check-item" onclick="toggleCheck(this,4)"><div class="check-box" id="cb4"></div><span class="check-text">Kjøl ned til 18–20°C og tilsett gjær</span></div>
+      <div class="check-item" onclick="toggleCheck(this,5)"><div class="check-box" id="cb5"></div><span class="check-text">Gjær i 10–14 dager</span></div>
+      <div class="check-item" onclick="toggleCheck(this,6)"><div class="check-box" id="cb6"></div><span class="check-text">Flask, karboner og nyt — server rundt 8°C 🍺</span></div>
+    </div>
+    <div class="complete-banner" id="completeBanner">
+      <div style="font-size:2rem;margin-bottom:.4rem">🎉</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700">Stouten er ferdig brygget!</div>
+      <div style="font-size:13px;opacity:.85;margin-top:.3rem">La den sette seg i noen dager — den blir bare bedre. Vel brygget!</div>
+    </div>
+  </div>
+
+  <!-- JUSTERINGER -->
+  <div class="card fade-up">
+    <h2>Juster smaken</h2>
+    <div style="margin-top:.5rem">
+      <div class="tip-item"><span class="tip-icon">➕</span><span style="font-size:14px;font-weight:300;color:var(--text)">Mer sødme → øk crystal malt eller laktose.</span></div>
+      <div class="tip-item"><span class="tip-icon">☕</span><span style="font-size:14px;font-weight:300;color:var(--text)">Mer kaffepreg → øk mengden ristet bygg.</span></div>
+      <div class="tip-item"><span class="tip-icon">🌵</span><span style="font-size:14px;font-weight:300;color:var(--text)">Tørrere øl → mesk på 65°C i stedet for 67°C.</span></div>
+      <div class="tip-item"><span class="tip-icon">🌑</span><span style="font-size:14px;font-weight:300;color:var(--text)">Mørkere farge → bruk Carafa Special II (mildere enn vanlig svartemalt).</span></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><strong>Brygg &amp; Oppskrifter</strong> — Håndlaget med ❤️ for øl &nbsp;·&nbsp; &copy; 2026</p>
+</footer>
+
+<script>
+const PAGE_KEY='brygg_check_stout';
+const TOTAL=7;
+let checks=JSON.parse(localStorage.getItem(PAGE_KEY)||'{}');
+
+function toggleCheck(el,i){checks[i]=!checks[i];localStorage.setItem(PAGE_KEY,JSON.stringify(checks));updateUI();}
+function resetChecks(){checks={};localStorage.setItem(PAGE_KEY,JSON.stringify(checks));updateUI();}
+
+function updateUI(){
+  const done=Object.values(checks).filter(Boolean).length;
+  document.getElementById('progressFill').style.width=Math.round((done/TOTAL)*100)+'%';
+  document.getElementById('progressText').textContent=done+' av '+TOTAL+' steg fullført';
+  for(let i=0;i<TOTAL;i++){
+    const cb=document.getElementById('cb'+i);
+    const item=cb&&cb.closest('.check-item');
+    if(!cb)continue;
+    if(checks[i]){cb.textContent='✓';item.classList.add('done');}
+    else{cb.textContent='';item.classList.remove('done');}
+  }
+  const banner=document.getElementById('completeBanner');
+  if(done===TOTAL)banner.classList.add('show');else banner.classList.remove('show');
+}
+
+let dark=localStorage.getItem('brygg_dark')==='1';
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+applyTheme();
+document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+updateUI();
+</script>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Til toppen">↑</button>
+<script>
+(function(){
+  const btn=document.getElementById("scrollTop");
+  window.addEventListener("scroll",function(){btn.classList.toggle("show",window.scrollY>400);},{passive:true});
+  const ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");ro.unobserve(e.target);}});},{threshold:0.06});
+  document.querySelectorAll(".reveal,.card,.beer-card,.stat-card").forEach(function(el){ro.observe(el);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();var s=document.getElementById("search");if(s)s.focus();}
+    if(e.key==="Escape"){document.activeElement.blur();}
+  });
+})();
+</script>
+</body>
+</html>
