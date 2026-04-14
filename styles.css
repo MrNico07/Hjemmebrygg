@@ -266,6 +266,25 @@ nav a:hover, nav a.active { background: rgba(255,255,255,.15); color: #fff; }
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(14,165,233,.06), transparent);
 }
+/* Light mode adjustments for recipe hero */
+[data-theme="light"] .recipe-hero {
+  background: linear-gradient(135deg, rgba(14,165,233,.08) 0%, rgba(59,130,246,.04) 100%);
+}
+[data-theme="light"] .recipe-hero .hero-info-time {
+  color: rgba(0,0,0,.85) !important;
+  text-shadow: 0 1px 3px rgba(255,255,255,.8), 0 3px 8px rgba(0,0,0,.15) !important;
+  font-weight: 500;
+}
+[data-theme="light"] .recipe-hero .print-btn {
+  color: rgba(0,0,0,.88) !important;
+  background: rgba(59,130,246,.12) !important;
+  border: 1px solid rgba(59,130,246,.25) !important;
+  text-shadow: none;
+  font-weight: 500;
+}
+[data-theme="light"] .recipe-hero .print-btn:hover {
+  background: rgba(59,130,246,.18) !important;
+}
 .recipe-emoji { font-size: 3.5rem; display: block; margin-bottom: .5rem; }
 .recipe-hero h1 {
   font-family: 'Playfair Display', serif;
