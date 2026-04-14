@@ -63,6 +63,7 @@
 
 <header>
   <div class="header-inner">
+    <button class="hamburger-btn" id="hamburgerBtn">☰</button>
     <a class="logo" href="index.html">
       <span class="logo-icon">🍺</span>
       <div>
@@ -79,6 +80,17 @@
     </nav>
   </div>
 </header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <nav>
+    <a href="index.html">Hjem</a>
+    <a href="all-beers.html">Alle øl</a>
+    <a href="brew-log.html">Logg</a>
+    <a href="about.html" class="active">Om oss</a>
+    <button class="theme-toggle" id="themeBtnMobile">🌙 Mørk</button>
+  </nav>
+</div>
 
 <section class="hero">
   <span class="hero-eyebrow">Om prosjektet</span>
@@ -232,9 +244,24 @@ document.getElementById('statLastSeen').textContent=last||'I dag';
 setCookie('brygg_last',new Date().toLocaleDateString('nb-NO'));
 
 let dark=localStorage.getItem('brygg_dark')==='1';
-function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').textContent=dark?'☀️ Lys':'🌙 Mørk';}
 applyTheme();
 document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+
+// ---- HAMBURGER MENU ----
+const hamburger = document.getElementById('hamburgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+function toggleMenu(){
+  sideMenu.classList.toggle('open');
+  menuOverlay.classList.toggle('open');
+}
+hamburger.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+document.querySelectorAll('#sideMenu nav a').forEach(link => {
+  link.addEventListener('click', toggleMenu);
+});
 </script>
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Til toppen">↑</button>
 <script>

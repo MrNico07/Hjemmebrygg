@@ -92,6 +92,7 @@
 
 <header>
   <div class="header-inner">
+    <button class="hamburger-btn" id="hamburgerBtn">☰</button>
     <a class="logo" href="index.html">
       <span class="logo-icon">🍺</span>
       <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
@@ -105,6 +106,16 @@
     </nav>
   </div>
 </header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <nav>
+    <a href="index.html">Hjem</a>
+    <a href="all-beers.html" class="active">Alle øl</a>
+    <a href="about.html">Om oss</a>
+    <button class="theme-toggle" id="themeBtnMobile">🌙 Mørk</button>
+  </nav>
+</div>
 
 <section class="hero">
   <span class="hero-eyebrow">Samlingen</span>
@@ -167,22 +178,26 @@ const BEERS = [
     desc:'Frisk, krydret ingefærøl med sitruspreg og balansert sødme.',
     tags:['lys','frukt'], link:'recipe-ginger-beer.html',
     sweetness:4, sourness:3, dryness:2,
-    og:'1.070', fg:'1.008', yeast:'Safale US-05', color:'Lys gyllen' },
+    og:'1.070', fg:'1.008', yeast:'Safale US-05', color:'Lys gyllen',
+    difficulty:'Beginner', brewTime:'2t', totalTime:'1 uke' },
   { id:'ipa', name:'Tropisk IPA', abv:6.5, ibu:50, emoji:'🍍', img:'./IMG_4439.jpg',
     desc:'Humledrevet øl med tropiske frukttoner og frisk bitterhet.',
     tags:['lys','frukt'], link:'recipe-ipa.html',
     sweetness:3, sourness:2, dryness:4,
-    og:'1.065', fg:'1.012', yeast:'Safale US-05', color:'Lys gyllen' },
+    og:'1.065', fg:'1.012', yeast:'Safale US-05', color:'Lys gyllen',
+    difficulty:'Intermediate', brewTime:'3t', totalTime:'3 uker' },
   { id:'stout', name:'Kremet Stout', abv:5.0, ibu:28, emoji:'☕', img:'./IMG_4285.jpg',
     desc:'Mørk og fyldig med toner av kaffe, sjokolade og karamell.',
     tags:['mørk'], link:'recipe-stout.html',
     sweetness:4, sourness:1, dryness:3,
-    og:'1.052', fg:'1.013', yeast:'SafAle S-04', color:'65 EBC' },
+    og:'1.052', fg:'1.013', yeast:'SafAle S-04', color:'65 EBC',
+    difficulty:'Intermediate', brewTime:'3t', totalTime:'4 uker' },
   { id:'christmas', name:'Juleøl', abv:5.8, ibu:32, emoji:'🎄', img:'',
     desc:'Klassisk norsk Winter Ale med karamell, tørket frukt og valgfritt julepreg.',
     tags:['mørk','sesong'], link:'recipe-christmas-ale.html',
     sweetness:4, sourness:1, dryness:3,
-    og:'1.058', fg:'1.014', yeast:'SafAle US-05 / Wyeast 1728', color:'45 EBC' }
+    og:'1.058', fg:'1.014', yeast:'SafAle US-05 / Wyeast 1728', color:'45 EBC',
+    difficulty:'Intermediate', brewTime:'3.5t', totalTime:'6 uker' }
 ];
 
 let favs = JSON.parse(localStorage.getItem('brygg_favs')||'[]');
@@ -198,9 +213,24 @@ setCookie('brygg_visits',visits);
 document.getElementById('visitPill').textContent='👁 '+visits;
 
 let dark=localStorage.getItem('brygg_dark')==='1';
-function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').textContent=dark?'☀️ Lys':'🌙 Mørk';}
 applyTheme();
 document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+
+// ---- HAMBURGER MENU ----
+const hamburger = document.getElementById('hamburgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+function toggleMenu(){
+  sideMenu.classList.toggle('open');
+  menuOverlay.classList.toggle('open');
+}
+hamburger.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+document.querySelectorAll('#sideMenu nav a').forEach(link => {
+  link.addEventListener('click', toggleMenu);
+});
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
@@ -281,6 +311,7 @@ function render(){
   grid.innerHTML=list.map((b,i)=>{
     const isFav=favs.includes(b.id);
     const inCmp=compareList.includes(b.id);
+    const diffColor={'Beginner':'#10b981','Intermediate':'#f59e0b','Advanced':'#ef4444'}[b.difficulty];
     return`<div class="beer-card fade-up" style="animation-delay:${i*.07}s;cursor:pointer" onclick="window.location='${b.link}'">
       <div class="card-img-wrap">
         <img src="${b.img}" alt="${b.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -290,7 +321,11 @@ function render(){
         <button class="card-compare-check${inCmp?' selected':''}" onclick="toggleCompare('${b.id}',event)" title="Legg til sammenligning">${inCmp?'✓':'+'}</button>
       </div>
       <div class="card-body">
-        <div class="card-title">${b.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem">
+          <div class="card-title" style="flex:1;margin-bottom:0">${b.name}</div>
+          <span style="background:${diffColor};color:white;font-size:10px;padding:4px 8px;border-radius:12px;font-weight:500;white-space:nowrap">${b.difficulty}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:.8rem">⏱️ ${b.brewTime} · ${b.totalTime}</div>
         <div class="card-desc">${b.desc}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.8rem">
           <div style="background:var(--bg3);border-radius:8px;padding:.5rem;text-align:center">

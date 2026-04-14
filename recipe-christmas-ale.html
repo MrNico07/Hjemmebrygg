@@ -11,6 +11,7 @@
 
 <header>
   <div class="header-inner">
+    <button class="hamburger-btn" id="hamburgerBtn">☰</button>
     <a class="logo" href="index.html">
       <span class="logo-icon">🍺</span>
       <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
@@ -25,6 +26,17 @@
   </div>
 </header>
 
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <nav>
+    <a href="index.html">Hjem</a>
+    <a href="all-beers.html">Alle øl</a>
+    <a href="brew-log.html">Logg</a>
+    <a href="about.html">Om oss</a>
+    <button class="theme-toggle" id="themeBtnMobile">🌙 Mørk</button>
+  </nav>
+</div>
+
 <section class="recipe-hero">
   <span class="recipe-emoji">🎄</span>
   <h1>Juleøl</h1>
@@ -36,7 +48,13 @@
     <span class="tag">45 EBC</span>
     <span class="tag">20L batch</span>
     <span class="tag">sesong</span>
+    <span class="tag" style="background:#f59e0b;color:white">🟡 Intermediate</span>
   </div>
+  <div style="margin-top:1rem;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:14px;color:rgba(255,255,255,.8)">
+    <div>⏱️ Bryggedag: <strong>3.5t</strong></div>
+    <div>📅 Total tid: <strong>6 uker</strong></div>
+  </div>
+  <button onclick="window.print()" style="margin-top:1.5rem;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;padding:8px 20px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s">🖨️ Skriv ut oppskrift</button>
 </section>
 
 <div class="recipe-grid">
@@ -69,6 +87,22 @@
       <div class="sensory-item"><div class="sensory-key">Smak</div><div class="sensory-val">Maltpreget, søt karamell, tørket frukt, mild bitterhet</div></div>
       <div class="sensory-item"><div class="sensory-key">Munnfølelse</div><div class="sensory-val">Fyldig, rund og myk</div></div>
       <div class="sensory-item"><div class="sensory-key">Finish</div><div class="sensory-val">Lett varmende, tørr avslutning</div></div>
+    </div>
+  </div>
+
+  <!-- UTSTYR -->
+  <div class="card fade-up">
+    <h2>Utstyr du trenger</h2>
+    <div style="margin-top:.5rem">
+      <div class="ing-item"><span class="ing-icon">🪣</span><span class="ing-name">Stor gryte (25L+)</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🌡️</span><span class="ing-name">Termometer</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">⚖️</span><span class="ing-name">Kjøkkenvekt</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🎛️</span><span class="ing-name">Hydrometer</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🪣</span><span class="ing-name">Gjæringskann (20L)</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🚰</span><span class="ing-name">Sprailer/hane til kran</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🧊</span><span class="ing-name">Kjøleslange</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">🍶</span><span class="ing-name">Plastflasker (20x500ml)</span><span class="ing-amount">✓</span></div>
+      <div class="ing-item"><span class="ing-icon">✋</span><span class="ing-name">Santizer/desinfeksjon</span><span class="ing-amount">✓</span></div>
     </div>
   </div>
 
@@ -187,9 +221,25 @@ function updateUI(){
 }
 
 let dark=localStorage.getItem('brygg_dark')==='1';
-function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').textContent=dark?'☀️ Lys':'🌙 Mørk';}
 applyTheme();
 document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+
+// ---- HAMBURGER MENU ----
+const hamburger = document.getElementById('hamburgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+function toggleMenu(){
+  sideMenu.classList.toggle('open');
+  menuOverlay.classList.toggle('open');
+}
+hamburger.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+document.querySelectorAll('#sideMenu nav a').forEach(link => {
+  link.addEventListener('click', toggleMenu);
+});
+
 updateUI();
 </script>
 

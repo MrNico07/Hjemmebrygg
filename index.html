@@ -32,6 +32,7 @@
 
 <header>
   <div class="header-inner">
+    <button class="hamburger-btn" id="hamburgerBtn">☰</button>
     <a class="logo" href="index.html">
       <span class="logo-icon">🍺</span>
       <div>
@@ -49,6 +50,17 @@
     </nav>
   </div>
 </header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <nav>
+    <a href="index.html" class="active">Hjem</a>
+    <a href="all-beers.html">Alle øl</a>
+    <a href="brew-log.html">Logg</a>
+    <a href="about.html">Om oss</a>
+    <button class="theme-toggle" id="themeBtnMobile">🌙 Mørk</button>
+  </nav>
+</div>
 
 <section class="hero">
   <span class="hero-eyebrow">Hjemmebryggeri</span>
@@ -102,16 +114,20 @@
 const BEERS = [
   { id:'ginger', name:'Sterk Ginger Beer', abv:6.0, emoji:'🍋', img:'./IMG_4407.jpg',
     desc:'Frisk, krydret ingefærøl med sitruspreg og balansert sødme.',
-    tags:['lys','frukt'], link:'recipe-ginger-beer.html', sweetness:4, sourness:3, dryness:2 },
+    tags:['lys','frukt'], link:'recipe-ginger-beer.html', sweetness:4, sourness:3, dryness:2,
+    difficulty:'Beginner', brewTime:'2t', totalTime:'1 uke' },
   { id:'ipa', name:'Tropisk IPA', abv:6.5, emoji:'🍍', img:'./IMG_4439.jpg',
     desc:'Humledrevet øl med tropiske frukttoner og frisk bitterhet.',
-    tags:['lys','frukt'], link:'recipe-ipa.html', sweetness:3, sourness:2, dryness:4 },
+    tags:['lys','frukt'], link:'recipe-ipa.html', sweetness:3, sourness:2, dryness:4,
+    difficulty:'Intermediate', brewTime:'3t', totalTime:'3 uker' },
   { id:'stout', name:'Kremet Stout', abv:5.0, emoji:'☕', img:'./IMG_4285.jpg',
     desc:'Mørk og fyldig med toner av kaffe, sjokolade og karamell.',
-    tags:['mørk'], link:'recipe-stout.html', sweetness:4, sourness:1, dryness:3 },
+    tags:['mørk'], link:'recipe-stout.html', sweetness:4, sourness:1, dryness:3,
+    difficulty:'Intermediate', brewTime:'3t', totalTime:'4 uker' },
   { id:'christmas', name:'Juleøl', abv:5.8, emoji:'🎄', img:'',
     desc:'Klassisk norsk Winter Ale med karamell, tørket frukt og valgfritt julepreg.',
-    tags:['mørk','sesong'], link:'recipe-christmas-ale.html', sweetness:4, sourness:1, dryness:3 }
+    tags:['mørk','sesong'], link:'recipe-christmas-ale.html', sweetness:4, sourness:1, dryness:3,
+    difficulty:'Intermediate', brewTime:'3.5t', totalTime:'6 uker' }
 ];
 
 function getCookie(k){const m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
@@ -131,11 +147,24 @@ if (lastVisit) document.getElementById('lastVisit').textContent = lastVisit;
 setCookie('brygg_last', new Date().toLocaleDateString('nb-NO'));
 
 let dark = localStorage.getItem('brygg_dark') === '1';
-function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('themeBtn').textContent=dark?'☀️ Lys':'🌙 Mørk';if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').textContent=dark?'☀️ Lys':'🌙 Mørk';}
 applyTheme();
 document.getElementById('themeBtn').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
+if(document.getElementById('themeBtnMobile'))document.getElementById('themeBtnMobile').onclick=()=>{dark=!dark;localStorage.setItem('brygg_dark',dark?'1':'0');applyTheme();};
 
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+// ---- HAMBURGER MENU ----
+const hamburger = document.getElementById('hamburgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+function toggleMenu(){
+  sideMenu.classList.toggle('open');
+  menuOverlay.classList.toggle('open');
+}
+hamburger.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+document.querySelectorAll('#sideMenu nav a').forEach(link => {
+  link.addEventListener('click', toggleMenu);
+});
 
 function toggleFav(id, e){
   e&&e.stopPropagation();
@@ -176,6 +205,7 @@ function render(){
     const isFav=favs.includes(b.id);
     const views=viewCounts[b.id]||0;
     const barW=n=>Math.round((n/5)*100);
+    const diffColor={'Beginner':'#10b981','Intermediate':'#f59e0b','Advanced':'#ef4444'}[b.difficulty];
     return`<div class="beer-card fade-up" style="animation-delay:${i*.07}s;cursor:pointer" onclick="trackView('${b.id}','${b.link}')">
       <div class="card-img-wrap">
         <img src="${b.img}" alt="${b.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -184,7 +214,11 @@ function render(){
         <button class="card-fav" onclick="toggleFav('${b.id}',event)" aria-label="Favoritt">${isFav?'❤️':'🤍'}</button>
       </div>
       <div class="card-body">
-        <div class="card-title">${b.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem">
+          <div class="card-title" style="flex:1;margin-bottom:0">${b.name}</div>
+          <span style="background:${diffColor};color:white;font-size:10px;padding:4px 8px;border-radius:12px;font-weight:500;white-space:nowrap">${b.difficulty}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:.8rem">⏱️ Bryggedag: ${b.brewTime} · Total: ${b.totalTime}</div>
         <div class="card-desc">${b.desc}</div>
         <div class="flavor-row"><span class="flavor-label">Sødme</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sweetness)}%"></div></div></div>
         <div class="flavor-row"><span class="flavor-label">Surhet</span><div class="flavor-bar-wrap"><div class="flavor-bar" style="width:${barW(b.sourness)}%"></div></div></div>
