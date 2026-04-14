@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – Brygg & Oppskrifter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-container { max-width: 400px; margin: 5rem auto; padding: 2rem; }
+    .login-box { background: var(--bg2); border: 1px solid var(--card-border); border-radius: 12px; padding: 2rem; }
+    .login-box h1 { text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input { width: 100%; padding: 12px; border: 1.5px solid var(--card-border); border-radius: 8px; background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); outline: none; transition: border-color .2s; }
+    .form-group input:focus { border-color: var(--accent); }
+    .login-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background .2s; }
+    .login-btn:hover { background: var(--accent2); }
+    .error-msg { background: #ef4444; color: white; padding: 12px; border-radius: 8px; margin-bottom: 1rem; display: none; }
+    
+    .admin-dashboard { display: none; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--card-border); }
+    .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: background .2s; }
+    .logout-btn:hover { background: #dc2626; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-box { background: var(--bg2); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .stat-box .value { font-size: 2.5rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+    .stat-box .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    
+    .section { background: var(--bg2); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+    .section h2 { margin-top: 0; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 1rem; }
+    
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--card-border); }
+    th { background: var(--bg3); font-weight: 600; color: var(--text); }
+    tr:hover { background: var(--bg3); }
+    
+    .action-btn { padding: 4px 12px; margin: 0 2px; border: 1px solid var(--card-border); background: var(--bg); border-radius: 6px; cursor: pointer; font-size: 11px; transition: all .2s; }
+    .action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    
+    .edit-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; padding: 2rem; }
+    .edit-modal.open { display: flex; }
+    .modal-content { background: var(--bg); border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+    
+    .button-group { display: flex; gap: 10px; margin-top: 1rem; }
+    .button-group button { flex: 1; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 8px; background: var(--bg2); color: var(--text); cursor: pointer; font-weight: 500; transition: all .2s; }
+    .button-group button.danger { background: #ef4444; color: white; border-color: #ef4444; }
+    .button-group button.danger:hover { background: #dc2626; }
+    .button-group button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .button-group button.primary:hover { background: var(--accent2); }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="header-inner">
+    <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+    <a class="logo" href="index.html">
+      <span class="logo-icon">🍺</span>
+      <div><div class="logo-text">Brygg &amp; Oppskrifter</div><div class="logo-sub">Hjemmebrygg</div></div>
+    </a>
+    <nav>
+      <a href="index.html">Hjem</a>
+      <a href="all-beers.html">Alle øl</a>
+      <a href="brew-log.html">Logg</a>
+      <a href="about.html">Om oss</a>
+      <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
+      <span id="adminBadge" style="background:#ef4444;color:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;display:none">🔐 Admin</span>
+    </nav>
+  </div>
+</header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <nav>
+    <a href="index.html">Hjem</a>
+    <a href="all-beers.html">Alle øl</a>
+    <a href="brew-log.html">Logg</a>
+    <a href="about.html">Om oss</a>
+    <button class="theme-toggle" id="themeBtnMobile">🌙 Mørk</button>
+  </nav>
+</div>
+
+<!-- LOGIN -->
+<div class="login-container" id="loginContainer">
+  <div class="login-box">
+    <h1>🔐 Admin Panel</h1>
+    <div class="error-msg" id="errorMsg"></div>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Passord</label>
+        <input type="password" id="passwordInput" placeholder="Skriv inn passord..." required>
+      </div>
+      <button type="submit" class="login-btn">Logg inn</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="admin-dashboard" id="adminDashboard">
+  <div style="max-width:1200px;margin:0 auto;padding:2rem">
+    <div class="admin-header">
+      <h1>📊 Admin Dashboard</h1>
+      <button class="logout-btn" onclick="handleLogout()">Logg ut</button>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="value" id="totalRecipes">0</div>
+        <div class="label">Oppskrifter</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" id="totalViews">0</div>
+        <div class="label">Totale views</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" id="totalFavs">0</div>
+        <div class="label">Samlet favoritter</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" id="totalVisits">0</div>
+        <div class="label">Nettstedsbesøk</div>
+      </div>
+    </div>
+
+    <!-- BEER STATISTICS -->
+    <div class="section">
+      <h2>🍺 Oppskrift-statistikk</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Øl</th>
+              <th>ABV</th>
+              <th>Views</th>
+              <th>Favoritter</th>
+              <th>Vanskelighetsgrad</th>
+              <th>Handlinger</th>
+            </tr>
+          </thead>
+          <tbody id="beerStatsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEARCH STATISTICS -->
+    <div class="section">
+      <h2>🔍 Søkehistorikk</h2>
+      <div id="searchStats" style="font-size:13px;color:var(--muted)">Ingen søk registrert ennå</div>
+    </div>
+
+    <!-- ADMIN TOOLS -->
+    <div class="section">
+      <h2>⚙️ Admin-Verktøy</h2>
+      <div style="display:grid;gap:10px">
+        <button class="action-btn" style="padding:10px;width:100%;background:var(--bg3);border:1px solid var(--card-border)" onclick="clearAllData()">🗑️ Tøm alle brukerdata</button>
+        <button class="action-btn" style="padding:10px;width:100%;background:var(--bg3);border:1px solid var(--card-border)" onclick="exportData()">💾 Eksporter data (JSON)</button>
+        <button class="action-btn" style="padding:10px;width:100%;background:var(--bg3);border:1px solid var(--card-border)" onclick="toggleDevTools()">🛠️ Dev-verktøy</button>
+      </div>
+    </div>
+
+    <!-- DEV TOOLS -->
+    <div class="section" id="devTools" style="display:none">
+      <h2>🛠️ Utviklings-verktøy</h2>
+      <div style="margin-bottom:1rem">
+        <label style="display:block;margin-bottom:0.5rem;font-weight:500">Generer test-data:</label>
+        <button class="action-btn" style="padding:8px 12px;background:var(--accent);color:white;border-color:var(--accent)" onclick="generateTestViews()">Generer tilfeldige views</button>
+        <button class="action-btn" style="padding:8px 12px;background:var(--accent);color:white;border-color:var(--accent)" onclick="generateTestFavs()">Generer tilfeldige favoritter</button>
+      </div>
+      <div>
+        <label style="display:block;margin-bottom:0.5rem;font-weight:500">LocalStorage Inspector:</label>
+        <textarea id="storageInspector" style="width:100%;height:200px;padding:10px;border:1px solid var(--card-border);border-radius:8px;font-family:monospace;font-size:12px;background:var(--bg);color:var(--text);resize:vertical" readonly></textarea>
+      </div>
+      <button class="action-btn" style="padding:8px 12px;background:var(--accent);color:white;border-color:var(--accent);margin-top:10px" onclick="refreshStorageInspector()">Oppdater Inspector</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="edit-modal" id="editModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    <h2 id="editModalTitle">Rediger øl</h2>
+    <div class="form-group">
+      <label>Navn</label>
+      <input type="text" id="editName">
+    </div>
+    <div class="form-group">
+      <label>ABV %</label>
+      <input type="number" id="editAbv" step="0.1">
+    </div>
+    <div class="form-group">
+      <label>Beskrivelse</label>
+      <textarea id="editDesc" style="width:100%;padding:10px;border:1px solid var(--card-border);border-radius:8px;background:var(--bg);color:var(--text);resize:vertical" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Vanskelighetsgrad</label>
+      <select id="editDifficulty" style="width:100%;padding:10px;border:1px solid var(--card-border);border-radius:8px;background:var(--bg);color:var(--text)">
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+      </select>
+    </div>
+    <div class="button-group">
+      <button onclick="closeEditModal()" style="border-color:var(--card-border)">Avbryt</button>
+      <button class="primary" onclick="saveEditedBeer()">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<footer style="text-align:center;padding:2rem;color:var(--muted);font-size:12px">
+  <p>🔐 Admin Panel – Passordbeskyttet område</p>
+</footer>
+
+<script>
+const ADMIN_PASSWORD = 'brygg2026'; // Admin passord
+
+let dark = localStorage.getItem('brygg_dark') === '1';
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = dark ? '☀️ Lys' : '🌙 Mørk';
+  if(document.getElementById('themeBtnMobile')) document.getElementById('themeBtnMobile').textContent = dark ? '☀️ Lys' : '🌙 Mørk';
+}
+applyTheme();
+document.getElementById('themeBtn').onclick = () => {
+  dark = !dark;
+  localStorage.setItem('brygg_dark', dark ? '1' : '0');
+  applyTheme();
+};
+if(document.getElementById('themeBtnMobile')) {
+  document.getElementById('themeBtnMobile').onclick = () => {
+    dark = !dark;
+    localStorage.setItem('brygg_dark', dark ? '1' : '0');
+    applyTheme();
+  };
+}
+
+// HAMBURGER MENU
+const hamburger = document.getElementById('hamburgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+function toggleMenu(){
+  sideMenu.classList.toggle('open');
+  menuOverlay.classList.toggle('open');
+}
+hamburger.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+document.querySelectorAll('#sideMenu nav a').forEach(link => {
+  link.addEventListener('click', toggleMenu);
+});
+
+// Toast
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Admin login
+function handleLogin(e){
+  e.preventDefault();
+  const pwd = document.getElementById('passwordInput').value;
+  const errorMsg = document.getElementById('errorMsg');
+  
+  if(pwd === ADMIN_PASSWORD){
+    localStorage.setItem('brygg_admin', '1');
+    errorMsg.style.display = 'none';
+    showAdmin();
+  } else {
+    errorMsg.textContent = '❌ Feil passord';
+    errorMsg.style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+  }
+}
+
+function handleLogout(){
+  localStorage.removeItem('brygg_admin');
+  location.reload();
+}
+
+function showAdmin(){
+  document.getElementById('loginContainer').style.display = 'none';
+  document.getElementById('adminDashboard').style.display = 'block';
+  document.getElementById('adminBadge').style.display = 'block';
+  loadStats();
+}
+
+function checkAdmin(){
+  if(localStorage.getItem('brygg_admin') === '1'){
+    showAdmin();
+  }
+}
+
+// Load stats
+function loadStats(){
+  const BEERS = [
+    { id:'ginger', name:'Sterk Ginger Beer', abv:6.0, difficulty:'Beginner' },
+    { id:'ipa', name:'Tropisk IPA', abv:6.5, difficulty:'Intermediate' },
+    { id:'stout', name:'Kremet Stout', abv:5.0, difficulty:'Intermediate' },
+    { id:'christmas', name:'Juleøl', abv:5.8, difficulty:'Intermediate' }
+  ];
+  
+  const viewCounts = JSON.parse(localStorage.getItem('brygg_views')||'{}');
+  const favs = JSON.parse(localStorage.getItem('brygg_favs')||'[]');
+  const visits = parseInt(document.cookie.match(/brygg_visits=(\d+)/)?.[1]||'0');
+  
+  document.getElementById('totalRecipes').textContent = BEERS.length;
+  document.getElementById('totalViews').textContent = Object.values(viewCounts).reduce((a,b)=>a+b,0);
+  document.getElementById('totalFavs').textContent = favs.length;
+  document.getElementById('totalVisits').textContent = visits;
+  
+  const tbody = document.getElementById('beerStatsTable');
+  tbody.innerHTML = BEERS.map(b => `
+    <tr>
+      <td><strong>${b.name}</strong></td>
+      <td>${b.abv}%</td>
+      <td>${viewCounts[b.id]||0}</td>
+      <td>${favs.includes(b.id)?1:0}</td>
+      <td>${b.difficulty}</td>
+      <td>
+        <button class="action-btn" onclick="openEditModal('${b.id}')">✏️ Rediger</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+let editingBeerId = null;
+function openEditModal(id){
+  const BEERS = {
+    'ginger': { name:'Sterk Ginger Beer', abv:6.0, desc:'Frisk, krydret og perfekt balansert — 6% ABV', difficulty:'Beginner' },
+    'ipa': { name:'Tropisk IPA', abv:6.5, desc:'Humledrevet øl med tropiske frukttoner og frisk bitterhet.', difficulty:'Intermediate' },
+    'stout': { name:'Kremet Stout', abv:5.0, desc:'Mørk og fyldig med toner av kaffe, sjokolade og karamell.', difficulty:'Intermediate' },
+    'christmas': { name:'Juleøl', abv:5.8, desc:'Klassisk norsk Winter Ale med karamell, tørket frukt og valgfritt julepreg.', difficulty:'Intermediate' }
+  };
+  
+  const beer = BEERS[id];
+  editingBeerId = id;
+  document.getElementById('editName').value = beer.name;
+  document.getElementById('editAbv').value = beer.abv;
+  document.getElementById('editDesc').value = beer.desc;
+  document.getElementById('editDifficulty').value = beer.difficulty;
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('open');
+  editingBeerId = null;
+}
+
+function saveEditedBeer(){
+  showToast('✅ Endringer lagret! (Demo - ikke persistent)');
+  closeEditModal();
+  loadStats();
+}
+
+function clearAllData(){
+  if(confirm('🗑️ Er du sikker? Dette vil slette alle brukerdata (views, favorites, visits).')){
+    localStorage.removeItem('brygg_views');
+    localStorage.removeItem('brygg_favs');
+    document.cookie = 'brygg_visits=0;path=/';
+    showToast('✅ Brukerdata slettet');
+    loadStats();
+  }
+}
+
+function exportData(){
+  const data = {
+    views: JSON.parse(localStorage.getItem('brygg_views')||'{}'),
+    favorites: JSON.parse(localStorage.getItem('brygg_favs')||'[]'),
+    visits: parseInt(document.cookie.match(/brygg_visits=(\d+)/)?.[1]||'0'),
+    exported: new Date().toISOString()
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `brygg-data-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  showToast('💾 Data eksportert');
+}
+
+function toggleDevTools(){
+  const devTools = document.getElementById('devTools');
+  devTools.style.display = devTools.style.display === 'none' ? 'block' : 'none';
+  if(devTools.style.display === 'block') refreshStorageInspector();
+}
+
+function refreshStorageInspector(){
+  const inspector = document.getElementById('storageInspector');
+  const data = {
+    views: JSON.parse(localStorage.getItem('brygg_views')||'{}'),
+    favorites: JSON.parse(localStorage.getItem('brygg_favs')||'[]'),
+    dark: localStorage.getItem('brygg_dark'),
+    admin: localStorage.getItem('brygg_admin'),
+    cookies: document.cookie
+  };
+  inspector.value = JSON.stringify(data, null, 2);
+}
+
+function generateTestViews(){
+  const BEERS = ['ginger','ipa','stout','christmas'];
+  const viewCounts = JSON.parse(localStorage.getItem('brygg_views')||'{}');
+  BEERS.forEach(id => {
+    viewCounts[id] = (viewCounts[id]||0) + Math.floor(Math.random()*20) + 5;
+  });
+  localStorage.setItem('brygg_views', JSON.stringify(viewCounts));
+  showToast('✅ Test-views generert');
+  loadStats();
+}
+
+function generateTestFavs(){
+  const BEERS = ['ginger','ipa','stout','christmas'];
+  const favs = JSON.parse(localStorage.getItem('brygg_favs')||'[]');
+  const rnd = BEERS[Math.floor(Math.random()*BEERS.length)];
+  if(!favs.includes(rnd)) favs.push(rnd);
+  localStorage.setItem('brygg_favs', JSON.stringify(favs));
+  showToast('✅ Test-favoritter lagt til');
+  loadStats();
+}
+
+checkAdmin();
+</script>
+</body>
+</html>
