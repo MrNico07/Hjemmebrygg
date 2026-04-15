@@ -46,7 +46,6 @@
       <a href="brew-log.html">Logg</a>
       <a href="about.html">Om oss</a>
       <button class="theme-toggle" id="themeBtn">🌙 Mørk</button>
-      <span class="visit-pill" id="visitPill">👁 —</span>
       <a href="admin.html" style="font-size:16px;padding:6px 10px" title="Admin Panel">🔐</a>
     </nav>
   </div>
@@ -214,9 +213,10 @@ let viewCounts = JSON.parse(localStorage.getItem('brygg_views')||'{}');
 let activeTag = 'alle';
 let favMode = false;
 
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
 const visits = parseInt(getCookie('brygg_visits')||'0') + 1;
 setCookie('brygg_visits', visits);
-document.getElementById('visitPill').textContent = '👁 ' + visits + ' besøk';
 document.getElementById('statVisits').textContent = visits;
 const lastVisit = getCookie('brygg_last');
 if (lastVisit) document.getElementById('lastVisit').textContent = lastVisit;
